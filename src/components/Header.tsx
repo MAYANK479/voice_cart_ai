@@ -47,9 +47,10 @@ export const Header: React.FC = () => {
           <Mic size={22} color="var(--accent-primary)" />
         </div>
         <div>
-          <h1 className="logo-title">VoiceCart AI</h1>
+          <h1 className="logo-title">FreshFlow</h1>
           <div className="logo-subtitle">Talk to your shopping list.</div>
         </div>
+
       </div>
 
       {/* Main Navigation Views */}

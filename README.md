@@ -1,4 +1,4 @@
-# VoiceCart AI — Voice-Enabled Grocery Shopping Assistant
+# FreshFlow — Voice-Enabled Grocery Shopping Assistant
 
 [![CI](https://github.com/MAYANK479/voice_cart_ai/actions/workflows/ci.yml/badge.svg)](https://github.com/MAYANK479/voice_cart_ai/actions/workflows/ci.yml)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=flat&logo=vercel&logoColor=white)](https://voice-cart-ai-opal.vercel.app/)
@@ -14,7 +14,8 @@
 
 ## Overview
 
-**VoiceCart AI** is a client-side grocery shopping web application built with **React 18, TypeScript, and Vite**. The system integrates the browser's native **Web Speech API** with a deterministic natural language parser that tokenizes speech transcripts into structured shopping actions (item names, compound quantities, units, brands, dietary tags, price bounds, and target lists) with sub-millisecond execution.
+**FreshFlow** is a client-side grocery shopping web application built with **React 18, TypeScript, and Vite**. The system integrates the browser's native **Web Speech API** with a deterministic natural language parser that tokenizes speech transcripts into structured shopping actions (item names, compound quantities, units, brands, dietary tags, price bounds, and target lists) with sub-millisecond execution.
+
 
 ### Key Capabilities
 1. **Predictive Restock & Smart Basket**: Calculates consumption velocity from purchase history to forecast depletion dates and pre-populate recurring staples.

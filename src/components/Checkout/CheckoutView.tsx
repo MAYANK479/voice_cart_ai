@@ -94,7 +94,7 @@ export const CheckoutView: React.FC = () => {
     const code = (codeToApply || promoCode).trim().toUpperCase();
     setPromoError('');
 
-    if (code === 'VOICECART10') {
+    if (code === 'FRESHFLOW10' || code === 'VOICECART10') {
       if (subtotal < 25) {
         setPromoError('Requires a minimum order subtotal of $25.00');
         return;
@@ -108,8 +108,9 @@ export const CheckoutView: React.FC = () => {
       setAppliedPromo({ code, discount: 15, type: 'percent' });
       addToast({ type: 'success', title: '15% Off Applied!', message: '15% saved on your fresh cart.' });
     } else {
-      setPromoError('Invalid coupon code. Try VOICECART10 or FREESHIP.');
+      setPromoError('Invalid coupon code. Try FRESHFLOW10 or FREESHIP.');
     }
+
   };
 
   const handlePlaceOrder = () => {
@@ -493,13 +494,14 @@ export const CheckoutView: React.FC = () => {
 
             {/* Preset Promo Chips */}
             <div className="promo-chips-row">
-              <button className="promo-chip" onClick={() => handleApplyPromo('VOICECART10')}>
-                VOICECART10 ($10 Off)
+              <button className="promo-chip" onClick={() => handleApplyPromo('FRESHFLOW10')}>
+                FRESHFLOW10 ($10 Off)
               </button>
               <button className="promo-chip" onClick={() => handleApplyPromo('FREESHIP')}>
                 FREESHIP
               </button>
             </div>
+
 
             {promoError && <div className="promo-error-text">{promoError}</div>}
             {appliedPromo && (

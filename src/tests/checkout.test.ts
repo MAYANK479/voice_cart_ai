@@ -13,7 +13,7 @@ describe('Checkout Calculations & Promo Code Validation Engine', () => {
     expect(subtotal).toBeCloseTo(4.99 * 2 + 3.49, 2);
   });
 
-  it('applies percentage discount coupon VOICECART10 correctly', () => {
+  it('applies percentage discount coupon FRESHFLOW10 correctly', () => {
     const subtotal = 40.00;
     const discount = subtotal * 0.10;
     expect(discount).toBe(4.00);
@@ -57,13 +57,14 @@ describe('Checkout Calculations & Promo Code Validation Engine', () => {
   });
 
   it('rejects invalid promo codes gracefully', () => {
-    const validCodes = ['VOICECART10', 'FREESHIP', 'HARVEST15'];
+    const validCodes = ['FRESHFLOW10', 'VOICECART10', 'FREESHIP', 'HARVEST15'];
     expect(validCodes.includes('FAKEDISCOUNT99')).toBe(false);
   });
 
   it('calculates final order grand total with all adjustments', () => {
     const subtotal = 40.00;
-    const discount = 4.00; // VOICECART10
+    const discount = 4.00; // FRESHFLOW10
+
     const delivery = 0; // Free > $35
     const tax = (40.00 - 4.00) * 0.08; // 2.88
     const total = (subtotal - discount) + delivery + tax;
