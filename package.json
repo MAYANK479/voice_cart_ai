@@ -1,8 +1,13 @@
 {
-  "name": "voice-command-shopping-assistant",
+  "name": "voicecart-ai",
+  "description": "Voice-enabled grocery shopping assistant built with React 18, TypeScript, and Vite. Features deterministic NLP entity parsing, consumption velocity restock forecasting, and 8-department auto-categorization.",
+  "homepage": "https://voice-cart-ai-opal.vercel.app/",
+  "author": "Mayank Pandey",
+  "license": "MIT",
   "private": true,
   "version": "1.0.0",
   "type": "module",
+
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
