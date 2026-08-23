@@ -8,12 +8,14 @@ import {
   SubstituteOption,
   PairingSuggestion,
   ShoppingHistoryRecord,
+  ActiveView,
 } from '../types/shopping';
 import {
   SpeechStatus,
   SupportedLanguage,
   ParsedCommand,
   ParsedItemEntity,
+  CommandLogEntry,
 } from '../types/speech';
 import { CatalogProduct } from '../types/catalog';
 import { speechService } from '../services/speechService';
@@ -25,7 +27,7 @@ import {
   getSubstitutesFor,
   findCompanionPairing,
 } from '../services/recommendationEngine';
-import { storageService, INITIAL_DEMO_ITEMS } from '../services/storageService';
+import { storageService, INITIAL_DEMO_ITEMS, INITIAL_DEMO_COMMANDS } from '../services/storageService';
 import { CATALOG_PRODUCTS } from '../data/catalogData';
 
 export interface ToastMessage {
@@ -39,6 +41,10 @@ export interface ToastMessage {
 }
 
 interface ShoppingContextType {
+  // Navigation
+  activeView: ActiveView;
+  setActiveView: (view: ActiveView) => void;
+
   // Shopping list state
   items: ShoppingItem[];
   addItem: (item: Partial<ShoppingItem>, announce?: boolean) => void;
@@ -48,6 +54,8 @@ interface ShoppingContextType {
   clearCompleted: () => void;
   clearAll: () => void;
   resetToDemo: () => void;
+  undoDelete: () => void;
+  lastDeletedItem: ShoppingItem | null;
 
   // Speech & Voice State
   speechStatus: SpeechStatus;
@@ -55,13 +63,19 @@ interface ShoppingContextType {
   interimTranscript: string;
   lastTranscript: string;
   lastParsedCommand: ParsedCommand | null;
+  showNlpCard: boolean;
+  setShowNlpCard: (show: boolean) => void;
   currentLanguage: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
   ttsEnabled: boolean;
   setTtsEnabled: (enabled: boolean) => void;
   startVoiceListening: () => void;
   stopVoiceListening: () => void;
-  processTextInputCommand: (text: string) => void;
+  processTextInputCommand: (text: string, source?: 'voice' | 'text' | 'demo') => void;
+
+  // Command History
+  commandLogs: CommandLogEntry[];
+  clearCommandLogs: () => void;
 
   // Intelligence & Suggestions
   restockPredictions: RestockPrediction[];
@@ -104,14 +118,19 @@ interface ShoppingContextType {
 
   // Export
   exportList: (format: 'csv' | 'json') => void;
+  exportCommandLogs: (format: 'csv' | 'json') => void;
 }
+
 
 const ShoppingContext = createContext<ShoppingContextType | undefined>(undefined);
 
 export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [activeView, setActiveView] = useState<ActiveView>('dashboard');
   const [items, setItems] = useState<ShoppingItem[]>(() => storageService.getItems());
   const [history] = useState<ShoppingHistoryRecord[]>(() => storageService.getHistory());
+  const [commandLogs, setCommandLogs] = useState<CommandLogEntry[]>(() => storageService.getCommands());
   const [budget, setBudgetState] = useState<number>(() => storageService.getBudget());
+  const [lastDeletedItem, setLastDeletedItem] = useState<ShoppingItem | null>(null);
 
   const [currentLanguage, setCurrentLanguageState] = useState<SupportedLanguage>(() => storageService.getLanguage());
   const [ttsEnabled, setTtsEnabledState] = useState<boolean>(() => storageService.getTTSEnabled());
@@ -122,6 +141,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [interimTranscript, setInterimTranscript] = useState<string>('');
   const [lastTranscript, setLastTranscript] = useState<string>('');
   const [lastParsedCommand, setLastParsedCommand] = useState<ParsedCommand | null>(null);
+  const [showNlpCard, setShowNlpCard] = useState<boolean>(false);
 
   // Modals & Navigation state
   const [catalogModalOpen, setCatalogModalOpen] = useState(false);
@@ -143,7 +163,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const newToast: ToastMessage = { ...toast, id };
     setToasts((prev) => [...prev, newToast]);
 
-    const duration = toast.duration || 4000;
+    const duration = toast.duration || 4500;
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, duration);
@@ -162,6 +182,10 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     storageService.saveHistory(history);
   }, [history]);
 
+  useEffect(() => {
+    storageService.saveCommands(commandLogs);
+  }, [commandLogs]);
+
   const setBudget = (newBudget: number) => {
     setBudgetState(newBudget);
     storageService.saveBudget(newBudget);
@@ -175,7 +199,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     addToast({
       type: 'info',
       title: 'Language Updated',
-      message: `Speech engine switched to ${lang}.`,
+      message: `Voice recognition engine set to ${lang}.`,
     });
   };
 
@@ -186,7 +210,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     addToast({
       type: 'info',
       title: enabled ? 'Voice Feedback Enabled' : 'Voice Feedback Muted',
-      message: enabled ? 'Assistant will now speak confirmations.' : 'Assistant voice is muted.',
+      message: enabled ? 'Assistant will speak confirmations.' : 'Assistant voice output is muted.',
     });
   };
 
@@ -208,6 +232,20 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
     return defaults[category] || 3.5;
   };
+
+  // Undo delete functionality
+  const undoDelete = useCallback(() => {
+    if (lastDeletedItem) {
+      setItems((prev) => [lastDeletedItem, ...prev]);
+      addToast({
+        type: 'success',
+        title: 'Item Restored',
+        message: `Restored "${lastDeletedItem.name}" to your shopping list.`,
+      });
+      ttsService.speak(`Restored ${lastDeletedItem.name}`);
+      setLastDeletedItem(null);
+    }
+  }, [lastDeletedItem, addToast]);
 
   // Shopping List Operations
   const addItem = useCallback(
@@ -276,12 +314,20 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const target = items.find((i) => i.id === idOrName || i.name.toLowerCase().includes(clean) || clean.includes(i.name.toLowerCase()));
 
       if (target) {
+        setLastDeletedItem(target);
         setItems((prev) => prev.filter((i) => i.id !== target.id));
         const msg = `Removed "${target.name}" from shopping list.`;
         addToast({
           type: 'info',
           title: 'Item Removed',
           message: msg,
+          actionLabel: 'Undo',
+          onAction: () => {
+            setItems((prev) => [target, ...prev]);
+            setLastDeletedItem(null);
+            ttsService.speak(`Restored ${target.name}`);
+          },
+          duration: 6000,
         });
         ttsService.speak(msg);
       } else {
@@ -330,7 +376,6 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     (id: string) => {
       setItems((prev) => {
         const next = prev.map((i) => (i.id === id ? { ...i, completed: !i.completed } : i));
-        // Check if all items completed!
         const allCompleted = next.length > 0 && next.every((i) => i.completed);
         if (allCompleted) {
           confetti({
@@ -352,8 +397,8 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 
   const clearCompleted = useCallback(() => {
-    const completedCount = items.filter((i) => i.completed).length;
-    if (completedCount === 0) {
+    const completedItems = items.filter((i) => i.completed);
+    if (completedItems.length === 0) {
       addToast({
         type: 'info',
         title: 'No Completed Items',
@@ -362,7 +407,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return;
     }
     setItems((prev) => prev.filter((i) => !i.completed));
-    const msg = `Cleared ${completedCount} completed items.`;
+    const msg = `Cleared ${completedItems.length} completed items.`;
     addToast({
       type: 'info',
       title: 'List Cleaned',
@@ -385,29 +430,60 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const resetToDemo = useCallback(() => {
     setItems(INITIAL_DEMO_ITEMS);
+    setCommandLogs(INITIAL_DEMO_COMMANDS);
     addToast({
       type: 'info',
-      title: 'Reset to Sample Data',
-      message: 'Restored pre-seeded demo items.',
+      title: 'Reset Sample Data',
+      message: 'Restored pre-seeded demo items and history.',
+    });
+  }, [addToast]);
+
+  const clearCommandLogs = useCallback(() => {
+    setCommandLogs([]);
+    storageService.saveCommands([]);
+    addToast({
+      type: 'info',
+      title: 'History Cleared',
+      message: 'Command execution history has been cleared.',
     });
   }, [addToast]);
 
   // Dispatch Parsed NLP Command into Actions
   const handleExecuteParsedCommand = useCallback(
-    (cmd: ParsedCommand) => {
+    (cmd: ParsedCommand, source: 'voice' | 'text' | 'demo' = 'voice') => {
       setLastParsedCommand(cmd);
+      setShowNlpCard(true);
+
+      // Record in Command Log History
+      const logEntry: CommandLogEntry = {
+        id: `cmd-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        timestamp: new Date().toISOString(),
+        command: cmd.rawTranscript,
+        intent: cmd.intent,
+        actionName: cmd.suggestedAction || cmd.intent,
+        resultMessage: cmd.feedbackMessage,
+        confidence: cmd.confidence,
+        source,
+        success: cmd.intent !== 'UNKNOWN',
+        itemCount: cmd.items.length,
+      };
+      setCommandLogs((prev) => [logEntry, ...prev]);
 
       switch (cmd.intent) {
         case 'ADD_ITEM': {
           cmd.items.forEach((itemEntity: ParsedItemEntity) => {
-            addItem({
-              name: itemEntity.name,
-              quantity: itemEntity.quantity,
-              unit: itemEntity.unit,
-              category: itemEntity.category,
-              dietaryTags: itemEntity.attributes,
-              source: 'voice',
-            }, false);
+            addItem(
+              {
+                name: itemEntity.name,
+                quantity: itemEntity.quantity,
+                unit: itemEntity.unit,
+                category: itemEntity.category,
+                dietaryTags: itemEntity.attributes,
+                brand: itemEntity.brand,
+                source: 'voice',
+              },
+              false
+            );
           });
           addToast({
             type: 'success',
@@ -530,18 +606,18 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setInterimTranscript('');
         setLastTranscript(transcript);
         const parsed = parseVoiceCommand(transcript, currentLanguage);
-        handleExecuteParsedCommand(parsed);
+        handleExecuteParsedCommand(parsed, 'voice');
       } else {
         setInterimTranscript(transcript);
       }
     };
 
-
     speechService.onErrorCallback = (errorMsg) => {
       addToast({
         type: 'error',
-        title: 'Voice Error',
+        title: 'Microphone Notice',
         message: errorMsg,
+        duration: 5500,
       });
       setSpeechStatus('idle');
       setIsListening(false);
@@ -559,11 +635,11 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   const processTextInputCommand = useCallback(
-    (text: string) => {
+    (text: string, source: 'voice' | 'text' | 'demo' = 'text') => {
       if (!text.trim()) return;
       setLastTranscript(text);
       const parsed = parseVoiceCommand(text, currentLanguage);
-      handleExecuteParsedCommand(parsed);
+      handleExecuteParsedCommand(parsed, source);
     },
     [currentLanguage, handleExecuteParsedCommand]
   );
@@ -617,9 +693,47 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   };
 
+  const exportCommandLogs = (format: 'csv' | 'json') => {
+    if (format === 'csv') {
+      const headers = ['Timestamp', 'Command', 'Intent', 'Action', 'Confidence', 'Result', 'Source'];
+      const rows = commandLogs.map((log) => [
+        `"${log.timestamp}"`,
+        `"${log.command.replace(/"/g, '""')}"`,
+        `"${log.intent}"`,
+        `"${log.actionName}"`,
+        (log.confidence * 100).toFixed(0) + '%',
+        `"${log.resultMessage.replace(/"/g, '""')}"`,
+        `"${log.source}"`,
+      ]);
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `command_history_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(commandLogs, null, 2));
+      const link = document.createElement('a');
+      link.setAttribute('href', dataStr);
+      link.setAttribute('download', `command_history_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    addToast({
+      type: 'success',
+      title: 'History Exported',
+      message: `Command history log exported as ${format.toUpperCase()}.`,
+    });
+  };
+
   return (
     <ShoppingContext.Provider
       value={{
+        activeView,
+        setActiveView,
         items,
         addItem,
         removeItem,
@@ -628,11 +742,15 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         clearCompleted,
         clearAll,
         resetToDemo,
+        undoDelete,
+        lastDeletedItem,
         speechStatus,
         isListening,
         interimTranscript,
         lastTranscript,
         lastParsedCommand,
+        showNlpCard,
+        setShowNlpCard,
         currentLanguage,
         setLanguage,
         ttsEnabled,
@@ -640,6 +758,8 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         startVoiceListening,
         stopVoiceListening,
         processTextInputCommand,
+        commandLogs,
+        clearCommandLogs,
         restockPredictions,
         seasonalPicks,
         substitutes,
@@ -670,12 +790,14 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         addToast,
         removeToast,
         exportList,
+        exportCommandLogs,
       }}
     >
       {children}
     </ShoppingContext.Provider>
   );
 };
+
 
 export const useShopping = (): ShoppingContextType => {
   const context = useContext(ShoppingContext);

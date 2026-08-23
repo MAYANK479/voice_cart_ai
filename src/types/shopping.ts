@@ -1,3 +1,5 @@
+export type ActiveView = 'dashboard' | 'insights' | 'history' | 'nlp-lab';
+
 export type CategoryId =
   | 'produce'
   | 'dairy'
@@ -8,6 +10,7 @@ export type CategoryId =
   | 'snacks'
   | 'household'
   | 'other';
+
 
 export interface CategoryInfo {
   id: CategoryId;

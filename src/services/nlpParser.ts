@@ -104,14 +104,15 @@ export function parseSingleItemString(itemStr: string): ParsedItemEntity {
 
   // Extract dietary/quality attributes
   const attrRegexes = [
-    { tag: 'Organic', regex: /\b(organic|orgánico|bio|biologique)\b/i },
+    { tag: 'Organic', regex: /\b(organic|orgánico|orgánica|organico|organica|bio|biologique)\b/i },
     { tag: 'Gluten-Free', regex: /\b(gluten[\s-]?free|sin gluten|sans gluten|glutenfrei)\b/i },
-    { tag: 'Vegan', regex: /\b(vegan|vegano|végétalien)\b/i },
+    { tag: 'Vegan', regex: /\b(vegan|vegano|vegana|végétalien|végétalienne)\b/i },
     { tag: 'Sugar-Free', regex: /\b(sugar[\s-]?free|sin azucar|sans sucre|zuckerfrei)\b/i },
     { tag: 'Keto', regex: /\b(keto|ketogenic)\b/i },
-    { tag: 'Dairy-Free', regex: /\b(dairy[\s-]?free|sin lactosa|sans lactose)\b/i },
-    { tag: 'Low-Fat', regex: /\b(low[\s-]?fat|desnatada|écrémé)\b/i },
+    { tag: 'Dairy-Free', regex: /\b(dairy[\s-]?free|sin lactosa|sans lactose|laktosefrei)\b/i },
+    { tag: 'Low-Fat', regex: /\b(low[\s-]?fat|desnatada|écrémé|fettarm)\b/i },
   ];
+
 
   for (const { tag, regex } of attrRegexes) {
     if (regex.test(text)) {
@@ -136,13 +137,14 @@ export function parseSingleItemString(itemStr: string): ParsedItemEntity {
     } else {
       // Check number words
       for (const [word, val] of Object.entries(NUMBER_WORDS)) {
-        const wordRegex = new RegExp(`^${word}\\b`, 'i');
+        const wordRegex = new RegExp(`^${word}(\\s+|$)`, 'i');
         if (wordRegex.test(text)) {
           quantity = val;
           text = text.replace(wordRegex, '').trim();
           break;
         }
       }
+
     }
   }
 
@@ -264,7 +266,7 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
   }
 
   // 6. SEARCH CATALOG & PRICE FILTER INTENT
-  // e.g. "Find me organic apples", "Find toothpaste under $5", "Search gluten-free snacks below 4 dollars"
+  // e.g. "Find me organic apples", "Find Colgate toothpaste under $5", "Search large eggs below 4 dollars"
   const searchPattern = /(find|search|look for|show me|buscar|trouver|suche|खोजें)\s+(.+)/i;
   const searchMatch = lower.match(searchPattern);
   const priceUnderPattern = /(under|below|less than|menos de|moins de|unter|से कम)\s+\$?(\d+(\.\d+)?)\s*(dollars|bucks|usd|\$)?/i;
@@ -274,6 +276,8 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
     let query = searchMatch ? searchMatch[2] : lower;
     let maxPrice: number | undefined;
     let minPrice: number | undefined;
+    let extractedBrand: string | undefined;
+    let extractedSize: string | undefined;
 
     // Check for between prices
     const betweenMatch = query.match(priceBetweenPattern);
@@ -289,22 +293,51 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
       }
     }
 
+    // Check known brands
+    const KNOWN_BRANDS = [
+      'colgate', 'crest', 'horizon', 'silk', 'chobani', 'oatly', 'heinz',
+      'barilla', 'quaker', 'vital farms', "dave's", 'dawn', 'tide', 'kind',
+      'nature valley', 'simple mills', 'lacroix', 'califia', 'beyond'
+    ];
+    for (const b of KNOWN_BRANDS) {
+      const brandRegex = new RegExp(`\\b${b}\\b`, 'i');
+      if (brandRegex.test(query)) {
+        extractedBrand = b.charAt(0).toUpperCase() + b.slice(1);
+        query = query.replace(brandRegex, '').trim();
+        break;
+      }
+    }
+
+    // Check known sizes
+    const KNOWN_SIZES = ['family size', 'large', 'small', 'medium', 'gallon', 'half gallon', '16 oz', '32 oz', 'dozen'];
+    for (const s of KNOWN_SIZES) {
+      const sizeRegex = new RegExp(`\\b${s}\\b`, 'i');
+      if (sizeRegex.test(query)) {
+        extractedSize = s;
+        query = query.replace(sizeRegex, '').trim();
+        break;
+      }
+    }
+
     // Clean query words
     query = query.replace(/\b(me|items?|products?|for)\b/gi, '').trim();
 
     result.intent = maxPrice !== undefined ? 'FILTER_PRICE' : 'SEARCH_CATALOG';
-    result.confidence = 0.92;
+    result.confidence = 0.90 + (maxPrice ? 0.04 : 0.02) + (extractedBrand ? 0.03 : 0);
     result.filterCriteria = {
       query: query || undefined,
+      brand: extractedBrand,
+      size: extractedSize,
       maxPrice,
       minPrice,
     };
     result.suggestedAction = 'SEARCH';
     result.feedbackMessage = maxPrice
       ? `Searching for "${query || 'products'}" with price under $${maxPrice.toFixed(2)}.`
-      : `Searching catalog for "${query}"...`;
+      : `Searching catalog for "${query || 'products'}"...`;
     return result;
   }
+
 
   // 7. REMOVE / DELETE ITEM INTENT
   // e.g. "Remove milk from my list", "Delete 100% whole wheat bread", "Drop the toothpaste", "Take off bananas"
@@ -354,11 +387,17 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
 
   // 9. ADD ITEM INTENT (Handles "Add X", "I need X", "I want to buy X", "Put X on my list", and chained "X and Y")
   // e.g. "Add 2 bottles of milk and 1 loaf of sourdough bread"
-  const addLeadPattern = /(add|i need|i want to buy|i want|buy|put|get me|please add|añadir|comprar|necesito|ajouter|j'ai besoin de|achetez|füge|ich brauche|kauf|जोड़ें|खरीदना है)\s+/i;
+  const addLeadPattern = /^(please\s+)?(add|i need|i want to buy|i want|buy|put|get me|please add|añadir|agregar|comprar|necesito|ajouter|j'ai besoin de|achetez|füge|ich brauche|kauf)\s+/i;
+  const addTrailPattern = /\s+(जोड़ें|खरीदना है|डालें|add kar do|daalo|चाहिए)$/i;
+
+  const hasExplicitAdd = addLeadPattern.test(lower) || addTrailPattern.test(lower);
   let itemsContent = lower;
 
-  if (addLeadPattern.test(lower)) {
-    itemsContent = lower.replace(addLeadPattern, '');
+  if (addLeadPattern.test(itemsContent)) {
+    itemsContent = itemsContent.replace(addLeadPattern, '');
+  }
+  if (addTrailPattern.test(itemsContent)) {
+    itemsContent = itemsContent.replace(addTrailPattern, '');
   }
 
   // Strip trailing "to my list", "to the shopping list", "in my cart"
@@ -384,9 +423,18 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
     }
   }
 
-  if (parsedItems.length > 0) {
+  // Only proceed with ADD_ITEM if explicit add intent was stated OR items are recognized grocery entities
+  const isRecognizedGrocery = parsedItems.some(
+    (i) => i.category !== 'other' || i.quantity > 1 || i.unit !== 'item' || (i.attributes && i.attributes.length > 0)
+  );
+
+  if (parsedItems.length > 0 && (hasExplicitAdd || isRecognizedGrocery)) {
     result.intent = 'ADD_ITEM';
-    result.confidence = 0.92;
+    let confidenceScore = 0.86;
+    if (hasExplicitAdd) confidenceScore += 0.06;
+    if (parsedItems.some((i) => i.quantity > 1 || i.unit !== 'item')) confidenceScore += 0.04;
+    if (parsedItems.some((i) => i.attributes && i.attributes.length > 0)) confidenceScore += 0.03;
+    result.confidence = Math.min(0.98, confidenceScore);
     result.items = parsedItems;
     result.suggestedAction = 'ADD';
 
@@ -395,9 +443,11 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
     return result;
   }
 
-  // Fallback: If no intent matched, parse as a direct item addition
+
+
+  // Fallback: If no explicit action matched, parse as item addition ONLY if recognized as a valid grocery category or item
   const fallbackItem = parseSingleItemString(lower);
-  if (fallbackItem.name && fallbackItem.name.length > 1) {
+  if (fallbackItem.name && fallbackItem.name.length > 1 && fallbackItem.category !== 'other') {
     result.intent = 'ADD_ITEM';
     result.confidence = 0.75;
     result.items = [fallbackItem];
@@ -406,6 +456,9 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
     return result;
   }
 
+  result.intent = 'UNKNOWN';
+  result.confidence = 0.35;
   result.feedbackMessage = "I didn't understand that command. Try saying 'Add 2 apples' or 'Find milk under $4'.";
   return result;
 }
+

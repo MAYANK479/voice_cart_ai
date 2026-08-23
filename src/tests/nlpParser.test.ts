@@ -91,6 +91,43 @@ describe('NLP Parser Engine', () => {
     expect(threeApples.quantity).toBe(3);
     expect(threeApples.attributes).toContain('Organic');
   });
+
+  it('should extract brand and size in search queries', () => {
+
+    const cmd = parseVoiceCommand('Find Colgate toothpaste under $5');
+    expect(cmd.intent).toBe('FILTER_PRICE');
+    expect(cmd.filterCriteria?.brand).toBe('Colgate');
+    expect(cmd.filterCriteria?.query).toBe('toothpaste');
+    expect(cmd.filterCriteria?.maxPrice).toBe(5);
+
+    const eggsCmd = parseVoiceCommand('Search large eggs below 4 dollars');
+    expect(eggsCmd.intent).toBe('FILTER_PRICE');
+    expect(eggsCmd.filterCriteria?.size).toBe('large');
+    expect(eggsCmd.filterCriteria?.query).toBe('eggs');
+    expect(eggsCmd.filterCriteria?.maxPrice).toBe(4);
+  });
+
+  it('should calculate deterministic confidence score above 0.85 for valid commands', () => {
+    const cmd = parseVoiceCommand('Add 2 bottles of organic milk');
+    expect(cmd.confidence).toBeGreaterThanOrEqual(0.9);
+    expect(cmd.confidence).toBeLessThanOrEqual(1.0);
+
+    const unknownCmd = parseVoiceCommand('asdf qwert 1234 xyz');
+    expect(unknownCmd.confidence).toBeLessThan(0.85);
+  });
+
+  it('should parse multilingual commands in Spanish and Hindi', () => {
+    const spanishCmd = parseVoiceCommand('Añadir 2 botellas de leche orgánica', 'es-ES');
+    expect(spanishCmd.intent).toBe('ADD_ITEM');
+    expect(spanishCmd.items[0].quantity).toBe(2);
+    expect(spanishCmd.items[0].unit).toBe('bottle');
+    expect(spanishCmd.items[0].attributes).toContain('Organic');
+
+    const hindiCmd = parseVoiceCommand('दो पैकेट दूध जोड़ें', 'hi-IN');
+    expect(hindiCmd.intent).toBe('ADD_ITEM');
+    expect(hindiCmd.items[0].quantity).toBe(2);
+    expect(hindiCmd.items[0].unit).toBe('pack');
+  });
 });
 
 describe('Categorization Engine', () => {
@@ -106,3 +143,4 @@ describe('Categorization Engine', () => {
     expect(categorizeItem('Dish Soap')).toBe('household');
   });
 });
+

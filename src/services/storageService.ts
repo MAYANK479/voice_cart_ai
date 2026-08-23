@@ -1,15 +1,77 @@
 import { ShoppingItem, ShoppingHistoryRecord } from '../types/shopping';
 import { INITIAL_SHOPPING_HISTORY } from '../data/historyData';
-import { SupportedLanguage } from '../types/speech';
+import { SupportedLanguage, CommandLogEntry } from '../types/speech';
 
 const STORAGE_KEYS = {
   ITEMS: 'voicecart_shopping_items_v1',
   HISTORY: 'voicecart_shopping_history_v1',
+  COMMANDS: 'voicecart_command_history_v1',
   BUDGET: 'voicecart_budget_limit_v1',
   LANGUAGE: 'voicecart_preferred_lang_v1',
   TTS_ENABLED: 'voicecart_tts_enabled_v1',
   THEME: 'voicecart_theme_v1',
 };
+
+export const INITIAL_DEMO_COMMANDS: CommandLogEntry[] = [
+  {
+    id: 'cmd-demo-1',
+    timestamp: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+    command: 'Add 2 bottles of organic milk',
+    intent: 'ADD_ITEM',
+    actionName: 'ADD',
+    resultMessage: 'Added 2 bottles of organic milk to your shopping list.',
+    confidence: 0.96,
+    source: 'voice',
+    success: true,
+    itemCount: 1,
+  },
+  {
+    id: 'cmd-demo-2',
+    timestamp: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
+    command: 'Add 3 lbs of Honeycrisp apples',
+    intent: 'ADD_ITEM',
+    actionName: 'ADD',
+    resultMessage: 'Added 3 lbs Honeycrisp apples to your shopping list.',
+    confidence: 0.95,
+    source: 'voice',
+    success: true,
+    itemCount: 1,
+  },
+  {
+    id: 'cmd-demo-3',
+    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    command: 'Find toothpaste under $5',
+    intent: 'FILTER_PRICE',
+    actionName: 'SEARCH',
+    resultMessage: 'Searching for "toothpaste" with price under $5.00.',
+    confidence: 0.94,
+    source: 'demo',
+    success: true,
+  },
+  {
+    id: 'cmd-demo-4',
+    timestamp: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    command: 'What should I restock?',
+    intent: 'GET_SUGGESTIONS',
+    actionName: 'RESTOCK',
+    resultMessage: "Analyzing your shopping history for items you're running low on...",
+    confidence: 0.95,
+    source: 'voice',
+    success: true,
+  },
+  {
+    id: 'cmd-demo-5',
+    timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+    command: 'Suggest a substitute for butter',
+    intent: 'GET_SUBSTITUTE',
+    actionName: 'SUBSTITUTE',
+    resultMessage: 'Finding smart dietary & healthy substitutes for "butter"...',
+    confidence: 0.95,
+    source: 'text',
+    success: true,
+  },
+];
+
 
 export const INITIAL_DEMO_ITEMS: ShoppingItem[] = [
   {
@@ -116,6 +178,28 @@ export const storageService = {
       console.warn('Error saving history to localStorage', e);
     }
   },
+
+  getCommands(): CommandLogEntry[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.COMMANDS);
+      if (!data) {
+        localStorage.setItem(STORAGE_KEYS.COMMANDS, JSON.stringify(INITIAL_DEMO_COMMANDS));
+        return INITIAL_DEMO_COMMANDS;
+      }
+      return JSON.parse(data);
+    } catch {
+      return INITIAL_DEMO_COMMANDS;
+    }
+  },
+
+  saveCommands(commands: CommandLogEntry[]): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.COMMANDS, JSON.stringify(commands));
+    } catch (e) {
+      console.warn('Error saving command history', e);
+    }
+  },
+
 
   getBudget(): number {
     try {

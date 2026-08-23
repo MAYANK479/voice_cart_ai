@@ -32,6 +32,7 @@ export interface ParsedItemEntity {
   unit: string;
   category: CategoryId;
   brand?: string;
+  size?: string;
   attributes?: string[];
   maxPrice?: number;
   minPrice?: number;
@@ -46,6 +47,8 @@ export interface ParsedCommand {
   items: ParsedItemEntity[];
   filterCriteria?: {
     query?: string;
+    brand?: string;
+    size?: string;
     maxPrice?: number;
     minPrice?: number;
     category?: CategoryId;
@@ -62,3 +65,17 @@ export interface SpeechRecognitionResultState {
   isFinal: boolean;
   confidence: number;
 }
+
+export interface CommandLogEntry {
+  id: string;
+  timestamp: string;
+  command: string;
+  intent: IntentType;
+  actionName: string;
+  resultMessage: string;
+  confidence: number;
+  source: 'voice' | 'text' | 'demo';
+  success: boolean;
+  itemCount?: number;
+}
+

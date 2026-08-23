@@ -8,7 +8,7 @@
 [![React 18](https://img.shields.io/badge/React-18.3-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Vitest](https://img.shields.io/badge/Tests-16%20Passing-10B981?style=flat&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-25%20Passing-10B981?style=flat&logo=vitest&logoColor=white)](https://vitest.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **[🌐 Experience the Live Application](https://voicecommandai.netlify.app)** • **[📖 Architecture](#-system-architecture)** • **[🧪 Run Unit Tests](#-testing--quality-assurance)** • **[🎙️ Voice Commands](#-supported-voice-commands)**
@@ -38,10 +38,10 @@
 
 | Evaluation Pillar | Target Standard | VoiceCart AI Implementation |
 | :--- | :--- | :--- |
-| **1. Problem-Solving Approach** | Clear architectural separation & edge-case handling | Decoupled NLP parser, fallback text input, confidence scoring, multilingual token normalization. |
+| **1. Problem-Solving Approach** | Clear architectural separation & edge-case handling | Decoupled NLP parser, fallback text input, deterministic confidence scoring, multilingual token normalization. |
 | **2. Code Quality & Standards** | Production-ready, maintainable, strictly typed | 100% TypeScript, strict compile rules, modular services, zero runtime console warnings. |
-| **3. Working Functionality** | 100% requirement fulfillment + error resilience | Continuous voice listening, 2-way TTS audio, restock velocity prediction, price-bound catalog search. |
-| **4. Documentation & UX** | Polished README + live demo ready + 200-word write-up | Live Netlify deployment, GitHub Actions CI, architecture diagrams, comprehensive test suite. |
+| **3. Working Functionality** | 100% requirement fulfillment + error resilience | Continuous voice listening, 2-way TTS audio, restock velocity prediction, price-bound catalog search, undo deletion. |
+| **4. Documentation & UX** | Polished README + live demo ready + 200-word write-up | Live Netlify deployment, GitHub Actions CI, architecture diagrams, comprehensive 25-test suite. |
 
 ---
 
@@ -58,13 +58,13 @@ graph TD
     A[Microphone / Voice Input] --> B[Web Speech API Recognition Engine]
     B --> C[NLP Intent & Entity Parser Pipeline]
     
-    C -->|Extracts Intent, Quantities, Units, Price Bounds| D{Intent Dispatcher}
+    C -->|Extracts Intent, Quantities, Units, Price Bounds, Brand, Size| D{Intent Dispatcher}
     
     D -->|ADD / REMOVE / MODIFY| E[Shopping List Store & Auto-Categorizer]
     D -->|SEARCH / PRICE FILTER| F[Product Catalog Search Engine]
     D -->|SUGGESTIONS / RESTOCK| G[Smart Intelligence Engine]
     
-    G --> G1[Restock Predictor from History]
+    G --> G1[Restock Predictor from History Velocity]
     G --> G2[Seasonal Harvest & Deals Engine]
     G --> G3[Smart Dietary Substitutes]
     G --> G4[Companion Item Pairings]
@@ -75,6 +75,9 @@ graph TD
     
     H --> I[Speech Synthesis TTS Audio Feedback]
     H --> J[Persistent Storage - LocalStorage / CSV & JSON Export]
+    H --> K[NLP Lab & Inspection Playground]
+    H --> L[Spending Analytics & Insights]
+    H --> M[Command Execution Audit Log History]
 ```
 
 ---
@@ -88,13 +91,13 @@ Switch languages using the top navbar dropdown to test voice recognition across 
 | **Add Single Item** | `"Add 2 bottles of organic milk"` | Adds item to Dairy with price & unit |
 | **Multi-Item Chaining** | `"Add 2 boxes of cereal and 1 loaf of bread"` | Simultaneously adds 2 items to distinct categories |
 | **Quantity & Fractions** | `"I need half a dozen pasture raised eggs"` | Parses quantity = 6, unit = carton |
-| **Price-Bound Search** | `"Find toothpaste under $5"` | Opens catalog filtered by query + max price |
+| **Price-Bound Search** | `"Find Colgate toothpaste under $5"` | Opens catalog filtered by brand + max price |
 | **Range Filter** | `"Find snacks between $2 and $6"` | Filters products within price range |
 | **Restock Prediction** | `"What should I restock?"` | Opens AI Restock predictions modal |
 | **Smart Substitutes** | `"Suggest a substitute for butter"` | Opens healthy/dietary alternatives finder |
 | **Seasonal & Deals** | `"What is in season today?"` | Shows peak-harvest produce and discounts |
 | **Modify Quantity** | `"Change apples quantity to 5"` | Updates quantity with voice confirmation |
-| **Remove / Delete** | `"Remove milk from my list"` | Removes specific item from list |
+| **Remove / Delete** | `"Remove milk from my list"` | Removes specific item with Undo toast action |
 | **Clear List** | `"Clear completed items"` / `"Clear all"` | Cleans up list with confirmation |
 | **Multilingual (Spanish)** | `"Añadir 2 botellas de leche orgánica"` | Native Spanish NLP entity parsing |
 | **Multilingual (Hindi)** | `"दो पैकेट दूध जोड़ें"` | Native Hindi NLP entity parsing |
@@ -105,20 +108,23 @@ Switch languages using the top navbar dropdown to test voice recognition across 
 
 ### 1. 🤖 Smart AI Suggestions Layer
 - **Restock Prediction Algorithm**: Tracks days since last purchase against product consumption velocity (e.g. Bread consumed every 5 days $\rightarrow$ predicts restock on Day 7).
-- **Dietary & Healthier Substitutes**: Live database of 1:1 ingredient alternatives (e.g. Dairy Milk $\leftrightarrow$ Oat Milk, Sugar $\leftrightarrow$ Stevia, Ground Beef $\leftrightarrow$ Plant Brick).
+- **Dietary & Healthier Substitutes**: Live database of 1:1 ingredient alternatives (e.g. Dairy Butter $\leftrightarrow$ Plant Spread / Olive Oil, Cow's Milk $\leftrightarrow$ Oat Milk, White Sugar $\leftrightarrow$ Stevia).
 - **Companion Meal Pairings**: Real-time cross-selling prompts (e.g. Adding *Tortilla Chips* prompts *Salsa*).
 
 ### 2. 🗂️ Automatic 8-Department Categorization
 - Automatically sorts items into: **Produce, Dairy & Eggs, Bakery, Meat & Seafood, Pantry, Beverages, Snacks, Household**.
 - Powered by a longest-match keyword token matcher that accurately distinguishes compound foods (e.g., *"Orange Juice"* $\rightarrow$ Beverages, *"Fresh Orange"* $\rightarrow$ Produce).
 
-### 3. 💰 Real-Time Budget Tracker
-- Live estimated cost calculation with visual progress bar.
-- Interactive budget limit editor with over-budget warning alerts.
+### 3. 🔬 Dedicated NLP Engineering Playground (NLP Lab)
+- Live interactive inspector that parses any natural-language sentence into structured entities, normalized tokens, deterministic confidence scores, and raw JSON AST representation.
 
-### 4. 📤 Export & Local Persistence
-- State persists across browser sessions using `localStorage`.
-- One-click export to formatted **CSV and JSON**.
+### 4. 📊 Spending Analytics & Audit History
+- Real-time spend allocation charts by grocery department.
+- Chronological command audit log with replay actions and export capabilities.
+
+### 5. 💰 Real-Time Budget Tracker & Undo Protection
+- Live estimated cost calculation with visual progress bar and over-budget alert warnings.
+- Instant item recovery with one-click **Undo** toast notifications.
 
 ---
 
@@ -151,18 +157,26 @@ VoiceCart AI includes a complete automated unit test suite built with **Vitest**
 
 ```bash
 # Run the unit tests
-npm run test
+npm test
 ```
 
-### Verified Test Suites (16 / 16 Passing):
-- `nlpParser.test.ts`:
+### Verified Test Suites (25 / 25 Passing):
+- `nlpParser.test.ts` (15 tests):
   - ✅ Simple phrase additions (*"Add milk"*)
   - ✅ Quantity & unit extractions (*"I need 2 bottles of water"*)
   - ✅ Multi-item sentence chaining (*"Add 2 boxes of cereal and 1 gallon of milk"*)
   - ✅ Price-bounded searches (*"Find toothpaste under $5"*, *"between $2 and $6"*)
-  - ✅ Modifications, deletions, and word numbers (*"half a dozen"*, *"dozen"*)
-  - ✅ Auto-categorization department accuracy across 8 categories
-- `recommendationEngine.test.ts`:
+  - ✅ Brand and size extraction (*"Find Colgate toothpaste under $5"*, *"Search large eggs below 4 dollars"*)
+  - ✅ Word numbers and fractional quantities (*"half a dozen"*, *"dozen"*)
+  - ✅ Multilingual commands in Spanish and Hindi
+  - ✅ Deterministic confidence calculation
+  - ✅ 8-department auto-categorization accuracy
+- `storageAndHistory.test.ts` (6 tests):
+  - ✅ Storage default initialization
+  - ✅ Initial demo command logs
+  - ✅ Restock velocity calculation & list deduplication
+  - ✅ Substitute matching & companion pairings
+- `recommendationEngine.test.ts` (4 tests):
   - ✅ Consumption velocity calculations & restock urgency ranking
   - ✅ Active list deduplication
   - ✅ Dietary substitute matching
@@ -193,10 +207,10 @@ voice_cart_ai/
 │   └── screenshots/            # High-resolution visual showcase assets
 ├── src/
 │   ├── main.tsx                 # React application entry point
-│   ├── App.tsx                  # Root layout & dashboard
-│   ├── index.css                # Glassmorphism design system & animations
+│   ├── App.tsx                  # Dynamic view routing (Dashboard, Insights, History, NLP Lab)
+│   ├── index.css                # Restrained dark theme design system & animations
 │   ├── context/
-│   │   └── ShoppingContext.tsx  # Central state store (Speech + Items + AI)
+│   │   └── ShoppingContext.tsx  # Central state store (Speech + Items + Command Logs + Undo)
 │   ├── services/
 │   │   ├── categorizer.ts       # Longest-match 8-dept categorizer
 │   │   ├── nlpParser.ts         # Natural language intent & entity extractor
@@ -205,14 +219,17 @@ voice_cart_ai/
 │   │   ├── ttsService.ts        # Two-way speech synthesis audio feedback
 │   │   └── storageService.ts    # Persistence & CSV/JSON export
 │   ├── components/
-│   │   ├── Header.tsx           # Navbar, language switcher, audio controls
-│   │   ├── VoiceAssistant/      # Voice orb, live transcript, prompt pills
-│   │   ├── ShoppingList/        # Auto-categorized list, items cards, export
-│   │   ├── Sidebar/             # Budget widget, Restock alerts
+│   │   ├── Header.tsx           # Navbar, navigation tabs, language switcher, audio controls
+│   │   ├── VoiceAssistant/      # Voice orb, live transcript, prompt pills, NLP card
+│   │   ├── ShoppingList/        # Auto-categorized list, item cards, quantity controls, undo
+│   │   ├── Sidebar/             # Budget tracker widget, Restock alerts
+│   │   ├── Insights/            # Spending analytics & consumption velocity charts
+│   │   ├── History/             # Chronological command execution audit log
+│   │   ├── NlpLab/              # Interactive NLP Playground & AST Inspector
 │   │   ├── Modals/              # Product catalog search, Smart AI picks, Help guide
-│   │   └── UI/                  # Toast notification stack
+│   │   └── UI/                  # Toast notification stack with action buttons
 │   ├── data/                    # Seed catalog, substitutes, seasonal & history data
-│   └── tests/                   # Automated Vitest test suites
+│   └── tests/                   # Automated Vitest test suites (25 tests)
 ├── index.html                   # HTML entry with SEO metadata & typography
 ├── package.json                 # Dependencies & scripts
 └── tsconfig.json                # Strict TypeScript configuration
@@ -221,8 +238,9 @@ voice_cart_ai/
 ---
 
 ## 📄 License
-This project is licensed under the MIT License — feel free to use and explore.
+This project is licensed under the MIT License.
 
 <div align="center">
 Built with ❤️ by <strong>Mayank Pandey</strong> for Technical Assessment Evaluation.
 </div>
+
