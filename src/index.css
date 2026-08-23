@@ -23,6 +23,7 @@
   --accent-coral-bright: #FF9E97;
   --accent-secondary: #EFEDF4;
   --accent-mint: #E8EFE8;
+  --accent-mint-text: #15803D;
   --accent-cyan: #C5E1EC;
   --accent-amber: #FDE68A;
   --accent-rose: #FCA5A5;
@@ -77,9 +78,11 @@
   --accent-coral-bright: #FFB7B2;
   --accent-secondary: #312E3D;
   --accent-mint: #2A362B;
+  --accent-mint-text: #34D399;
   --accent-cyan: #38BDF8;
   --accent-amber: #FBBF24;
   --accent-rose: #FB7185;
+
 
   --text-primary: #F5F1EA;      /* Warm off-white text */
   --text-secondary: #D6D0C7;
@@ -269,13 +272,14 @@ button, input, select, textarea {
   border: 1px solid var(--border-glass);
   box-shadow: var(--shadow-sm);
   position: sticky;
-  top: 0.75rem;
+  top: 0;
   z-index: 100;
   gap: 0.75rem;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
 }
+
 
 .logo-group {
   display: flex;
@@ -422,7 +426,7 @@ button, input, select, textarea {
 .btn-icon.active {
   background: rgba(16, 185, 129, 0.15);
   border-color: var(--accent-primary);
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
 }
 
 .btn-subtle {
@@ -517,9 +521,10 @@ button, input, select, textarea {
   gap: 0.4rem;
   font-size: 0.76rem;
   font-weight: 600;
-  color: var(--accent-mint);
+  color: var(--text-secondary);
   letter-spacing: 0.02em;
 }
+
 
 .deck-glow-dot {
   width: 7px;
@@ -718,7 +723,7 @@ button, input, select, textarea {
   background: rgba(16, 185, 129, 0.08);
   border: 1px solid rgba(16, 185, 129, 0.25);
   font-size: 0.84rem;
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
   animation: fadeIn 0.2s ease;
 }
 
@@ -824,7 +829,7 @@ button, input, select, textarea {
 
 .voice-status-badge.listening {
   background: rgba(16, 185, 129, 0.15);
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
@@ -904,11 +909,12 @@ button, input, select, textarea {
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius-full);
   background: rgba(16, 185, 129, 0.15);
-  color: var(--accent-mint);
+  color: #34D399;
   border: 1px solid rgba(16, 185, 129, 0.3);
   font-size: 0.74rem;
   font-weight: 700;
 }
+
 
 .nlp-command-display {
   background: rgba(0, 0, 0, 0.25);
@@ -997,7 +1003,7 @@ button, input, select, textarea {
   gap: 0.3rem;
   background: transparent;
   border: none;
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
@@ -1128,7 +1134,7 @@ button, input, select, textarea {
   height: 36px;
   border-radius: var(--radius-md);
   background: rgba(16, 185, 129, 0.2);
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1241,7 +1247,7 @@ button, input, select, textarea {
 
 .price-bold {
   font-weight: 700;
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
 }
 
 /* Build My List AI Action Button */
@@ -1306,7 +1312,7 @@ button, input, select, textarea {
 
 
 .voice-source-tag {
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
   font-size: 0.7rem;
   font-weight: 600;
 }
@@ -1399,7 +1405,7 @@ button, input, select, textarea {
 }
 
 [data-theme="dark"] .for-you-title {
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
 }
 
 /* Build My List Card */
@@ -1424,7 +1430,7 @@ button, input, select, textarea {
 .build-card-badge {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -1483,7 +1489,7 @@ button, input, select, textarea {
 .subtle-link {
   background: none;
   border: none;
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
@@ -1542,7 +1548,7 @@ button, input, select, textarea {
   border-radius: var(--radius-full);
   background: var(--bg-surface);
   border: 1px solid var(--border-glass);
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
   font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
@@ -1731,7 +1737,7 @@ button, input, select, textarea {
 .summary-amount {
   font-size: 1.2rem;
   font-weight: 800;
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
 }
 
 .build-modal-actions {
@@ -2069,7 +2075,7 @@ button, input, select, textarea {
   border-radius: var(--radius-sm);
   background: rgba(16, 185, 129, 0.15);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
   font-size: 0.74rem;
   font-weight: 700;
   cursor: pointer;
@@ -2396,7 +2402,7 @@ button, input, select, textarea {
   padding: 0.15rem 0.5rem;
   border-radius: var(--radius-full);
   background: rgba(16, 185, 129, 0.15);
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
 }
 
 .log-intent-badge.remove_item { background: rgba(239, 68, 68, 0.15); color: #f87171; }
@@ -2523,7 +2529,7 @@ button, input, select, textarea {
 
 .meta-value-highlight {
   font-weight: 700;
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
 }
 
 .nlp-feedback-box {
@@ -2558,7 +2564,7 @@ button, input, select, textarea {
 
 .tag-qty {
   background: rgba(16, 185, 129, 0.15);
-  color: var(--accent-mint);
+  color: var(--accent-mint-text);
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
   font-weight: 700;

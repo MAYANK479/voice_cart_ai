@@ -23,10 +23,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({ categoryId, it
           <span className="badge-counter" style={{ background: categoryInfo.bgColor, color: categoryInfo.color, borderColor: categoryInfo.color }}>
             {items.length}
           </span>
-          <span style={{ fontFamily: 'var(--font-accent)', fontSize: '1.2rem', color: 'var(--text-muted)', marginLeft: '0.2rem', opacity: 0.85 }}>
-            fresh
-          </span>
         </div>
+
 
 
         <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)' }}>
