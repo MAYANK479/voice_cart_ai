@@ -345,7 +345,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Shopping List Operations
   const addItem = useCallback(
-    (item: Partial<ShoppingItem>, announce = true) => {
+    (item: Partial<ShoppingItem>, announce = false) => {
       if (!item.name || !item.name.trim()) return;
 
       const cleanName = item.name.trim();
@@ -399,7 +399,6 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           title: 'Item Added',
           message: msg,
         });
-        ttsService.speak(msg);
       }
 
       // Check companion pairing suggestion
@@ -452,11 +451,9 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         title: 'Smart Basket Assembled',
         message: `Added ${basketItems.length} personalized items to ${activeListName}.`,
       });
-      ttsService.speak(`Added ${basketItems.length} items to your shopping list.`);
     },
     [items, activeListId, activeListName, addToast]
   );
-
 
   const removeItem = useCallback(
     (idOrName: string) => {
@@ -475,18 +472,15 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           onAction: () => {
             setItems((prev) => [target, ...prev]);
             setLastDeletedItem(null);
-            ttsService.speak(`Restored ${target.name}`);
           },
           duration: 6000,
         });
-        ttsService.speak(msg);
       } else {
         addToast({
           type: 'warning',
           title: 'Item Not Found',
           message: `Could not find "${idOrName}" in your list.`,
         });
-        ttsService.speak(`Could not find ${idOrName} in your list.`);
       }
     },
     [items, addToast]
@@ -516,7 +510,6 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           title: 'Quantity Updated',
           message: msg,
         });
-        ttsService.speak(msg);
       }
     },
     [items, addToast]
@@ -533,7 +526,6 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             spread: 70,
             origin: { y: 0.6 },
           });
-          ttsService.speak('Awesome! You have completed all items on your shopping list!');
           addToast({
             type: 'success',
             title: '🎉 Shopping Complete!',
@@ -563,7 +555,6 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       title: 'List Cleaned',
       message: msg,
     });
-    ttsService.speak(msg);
   }, [items, addToast]);
 
   const clearAll = useCallback(() => {
@@ -575,8 +566,8 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       title: 'List Cleared',
       message: msg,
     });
-    ttsService.speak(msg);
   }, [items, addToast]);
+
 
   const resetToDemo = useCallback(() => {
     setItems(INITIAL_DEMO_ITEMS);
