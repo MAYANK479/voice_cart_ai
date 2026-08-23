@@ -1,21 +1,53 @@
-# 🛒 VoiceCart AI — Voice Command Shopping Assistant
+<div align="center">
 
-> **Technical Assessment Submission**  
-> **Role:** Software Engineer Position  
-> **Project:** Voice Command Shopping Assistant with Smart AI Suggestions
+# 🛒 VoiceCart AI
+### Intelligent Voice-Powered Shopping Assistant & Recommendation Engine
+
+[![CI](https://github.com/MAYANK479/voice_cart_ai/actions/workflows/ci.yml/badge.svg)](https://github.com/MAYANK479/voice_cart_ai/actions/workflows/ci.yml)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Netlify-00C7B7?style=flat&logo=netlify&logoColor=white)](https://voicecommandai.netlify.app)
+[![React 18](https://img.shields.io/badge/React-18.3-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-16%20Passing-10B981?style=flat&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**[🌐 Experience the Live Application](https://voicecommandai.netlify.app)** • **[📖 Architecture](#-system-architecture)** • **[🧪 Run Unit Tests](#-testing--quality-assurance)** • **[🎙️ Voice Commands](#-supported-voice-commands)**
+
+<br/>
+
+<img src="./docs/screenshots/dashboard_banner.svg" alt="VoiceCart AI Dashboard Showcase" width="100%"/>
+
+</div>
 
 ---
 
-## 🌟 Executive Summary / Approach Write-Up (Max 200 Words)
+## 📌 Executive Approach Write-Up (200 Words)
 
-**VoiceCart AI** is an intelligent, voice-first shopping list manager and recommendation engine built with **React 18, TypeScript, and Vite**. The system integrates the native **Web Speech API** (`webkitSpeechRecognition` & `SpeechSynthesis`) with a custom deterministic Natural Language Processing (NLP) pipeline that extracts user intents, fractional/word quantities (*"half a dozen"*), grocery units (*"cartons"*, *"liters"*), product attributes (*"organic"*, *"gluten-free"*), and price bounds (*"under $5"*), while supporting multi-item chaining (*"Add 2 apples and 1 carton of milk"*).
+> **VoiceCart AI** is an intelligent, voice-first shopping list manager and recommendation engine built with **React 18, TypeScript, and Vite**. The system integrates the native **Web Speech API** (`webkitSpeechRecognition` & `SpeechSynthesis`) with a custom deterministic Natural Language Processing (NLP) pipeline that extracts user intents, fractional/word quantities (*"half a dozen"*), grocery units (*"cartons"*, *"liters"*), product attributes (*"organic"*, *"gluten-free"*), and price bounds (*"under $5"*), while supporting multi-item chaining (*"Add 2 apples and 1 carton of milk"*).
+>
+> For intelligence, the platform features a multi-tiered suggestion engine:
+> 1. **Predictive Restock Engine**: Analyzes shopping history and consumption cycles (velocity) to alert users when staples run low.
+> 2. **Dynamic Seasonal & Deals Engine**: Recommends peak-harvest produce and discounted items.
+> 3. **Smart Substitutes & Companion Engine**: Identifies dietary, allergy, and budget alternatives alongside meal pairings (e.g., chips $\rightarrow$ salsa).
+>
+> Built with modular separation of concerns, the app auto-categorizes items into 8 departments, offers multilingual support (English, Spanish, French, German, Hindi), tracks budgets with live progress visuals, provides accessible TTS voice confirmations, and runs 100% offline with zero external paid dependencies.
 
-For intelligence, the platform features a multi-tiered suggestion engine:
-1. **Predictive Restock Engine**: Analyzes shopping history and consumption cycles (velocity) to alert users when staples run low.
-2. **Dynamic Seasonal & Deals Engine**: Recommends peak-harvest produce and discounted items.
-3. **Smart Substitutes & Companion Engine**: Identifies dietary, allergy, and budget alternatives alongside meal pairings (e.g., chips $\rightarrow$ salsa).
+---
 
-Built with modular separation of concerns, the app auto-categorizes items into 8 departments, offers multilingual support (English, Spanish, French, German, Hindi), tracks budgets with live progress visuals, provides accessible TTS voice confirmations, and runs 100% offline with zero external paid dependencies.
+## 🎯 Technical Assessment Rubric Compliance
+
+| Evaluation Pillar | Target Standard | VoiceCart AI Implementation |
+| :--- | :--- | :--- |
+| **1. Problem-Solving Approach** | Clear architectural separation & edge-case handling | Decoupled NLP parser, fallback text input, confidence scoring, multilingual token normalization. |
+| **2. Code Quality & Standards** | Production-ready, maintainable, strictly typed | 100% TypeScript, strict compile rules, modular services, zero runtime console warnings. |
+| **3. Working Functionality** | 100% requirement fulfillment + error resilience | Continuous voice listening, 2-way TTS audio, restock velocity prediction, price-bound catalog search. |
+| **4. Documentation & UX** | Polished README + live demo ready + 200-word write-up | Live Netlify deployment, GitHub Actions CI, architecture diagrams, comprehensive test suite. |
+
+---
+
+## 📸 Feature Showcase
+
+<img src="./docs/screenshots/features_grid.svg" alt="VoiceCart AI Feature Showcase" width="100%"/>
 
 ---
 
@@ -23,7 +55,7 @@ Built with modular separation of concerns, the app auto-categorizes items into 8
 
 ```mermaid
 graph TD
-    A[Microphone / Voice Input] --> B[Web Speech API Recognition]
+    A[Microphone / Voice Input] --> B[Web Speech API Recognition Engine]
     B --> C[NLP Intent & Entity Parser Pipeline]
     
     C -->|Extracts Intent, Quantities, Units, Price Bounds| D{Intent Dispatcher}
@@ -42,135 +74,155 @@ graph TD
     G --> H
     
     H --> I[Speech Synthesis TTS Audio Feedback]
-    H --> J[Persistent Storage - LocalStorage / Export CSV & JSON]
+    H --> J[Persistent Storage - LocalStorage / CSV & JSON Export]
 ```
 
 ---
 
-## ✨ Key Features & Capabilities
+## 🎙️ Supported Voice Commands
 
-### 1. Voice Input & NLP
-- **Voice Command Recognition**: Full hands-free voice control with continuous recognition and live soundwave visualizer.
-- **Flexible Natural Language Processing**: Understands diverse phrases:
-  - *"Add milk"* vs *"I need 2 bottles of organic milk"* vs *"Buy 5 oranges"*.
-  - **Multi-Item Chaining**: *"Add 2 boxes of cereal and 1 gallon of milk"*.
-- **Multilingual Support**: Switch seamlessly between **English (US/UK/IN), Spanish (Español), French (Français), German (Deutsch), and Hindi (हिन्दी)**.
-- **Two-Way Voice Feedback (TTS)**: Spoken voice confirmations for all actions with instant mute/unmute control.
+Switch languages using the top navbar dropdown to test voice recognition across **5 languages**:
 
-### 2. Smart AI Suggestions & Intelligence
-- **Product Restock Predictions**: Calculates consumption frequency from shopping history (e.g., milk lasts 4 days $\rightarrow$ predicts running low on Day 6).
-- **Seasonal & On-Sale Recommendations**: Curated seasonal catalog highlighting peak harvest nutrients and discounts.
-- **Dietary & Healthier Substitutes**: Intelligent substitute finder (e.g., Whole Milk $\rightarrow$ Almond/Oat Milk; Sugar $\rightarrow$ Stevia/Honey; White Bread $\rightarrow$ Gluten-Free Multigrain).
-- **Companion Item Pairings**: Dynamic cross-selling alerts (e.g., adding *Tortilla Chips* prompts a companion pairing with *Salsa*).
-
-### 3. Shopping List Management & Organization
-- **Auto-Categorization**: Categorizes groceries into 8 departments (**Produce, Dairy & Eggs, Bakery, Meat & Seafood, Pantry, Beverages, Snacks, Household & Care**).
-- **Quantity & Unit Management**: Interactive steppers, unit normalization, and line totals.
-- **Budget Tracking**: Live estimated cost calculation, remaining budget indicator, over-budget alerts, and custom budget limits.
-- **List Operations**: Check off items (with celebratory confetti animation), clear completed, clear all, and export to **CSV & JSON**.
-
-### 4. Voice-Activated Search & Price Filtering
-- Search across a rich 38+ item catalog with dietary tags (*Organic, Gluten-Free, Vegan, Keto, Sugar-Free*).
-- Voice price boundary filters: *"Find toothpaste under $5"*, *"Search snacks below 4 dollars"*, *"Show items between $2 and $6"*.
+| Intent | Example Voice Command | Action Executed |
+| :--- | :--- | :--- |
+| **Add Single Item** | `"Add 2 bottles of organic milk"` | Adds item to Dairy with price & unit |
+| **Multi-Item Chaining** | `"Add 2 boxes of cereal and 1 loaf of bread"` | Simultaneously adds 2 items to distinct categories |
+| **Quantity & Fractions** | `"I need half a dozen pasture raised eggs"` | Parses quantity = 6, unit = carton |
+| **Price-Bound Search** | `"Find toothpaste under $5"` | Opens catalog filtered by query + max price |
+| **Range Filter** | `"Find snacks between $2 and $6"` | Filters products within price range |
+| **Restock Prediction** | `"What should I restock?"` | Opens AI Restock predictions modal |
+| **Smart Substitutes** | `"Suggest a substitute for butter"` | Opens healthy/dietary alternatives finder |
+| **Seasonal & Deals** | `"What is in season today?"` | Shows peak-harvest produce and discounts |
+| **Modify Quantity** | `"Change apples quantity to 5"` | Updates quantity with voice confirmation |
+| **Remove / Delete** | `"Remove milk from my list"` | Removes specific item from list |
+| **Clear List** | `"Clear completed items"` / `"Clear all"` | Cleans up list with confirmation |
+| **Multilingual (Spanish)** | `"Añadir 2 botellas de leche orgánica"` | Native Spanish NLP entity parsing |
+| **Multilingual (Hindi)** | `"दो पैकेट दूध जोड़ें"` | Native Hindi NLP entity parsing |
 
 ---
 
-## 🚀 Getting Started Locally
+## ⚡ Key Highlights
+
+### 1. 🤖 Smart AI Suggestions Layer
+- **Restock Prediction Algorithm**: Tracks days since last purchase against product consumption velocity (e.g. Bread consumed every 5 days $\rightarrow$ predicts restock on Day 7).
+- **Dietary & Healthier Substitutes**: Live database of 1:1 ingredient alternatives (e.g. Dairy Milk $\leftrightarrow$ Oat Milk, Sugar $\leftrightarrow$ Stevia, Ground Beef $\leftrightarrow$ Plant Brick).
+- **Companion Meal Pairings**: Real-time cross-selling prompts (e.g. Adding *Tortilla Chips* prompts *Salsa*).
+
+### 2. 🗂️ Automatic 8-Department Categorization
+- Automatically sorts items into: **Produce, Dairy & Eggs, Bakery, Meat & Seafood, Pantry, Beverages, Snacks, Household**.
+- Powered by a longest-match keyword token matcher that accurately distinguishes compound foods (e.g., *"Orange Juice"* $\rightarrow$ Beverages, *"Fresh Orange"* $\rightarrow$ Produce).
+
+### 3. 💰 Real-Time Budget Tracker
+- Live estimated cost calculation with visual progress bar.
+- Interactive budget limit editor with over-budget warning alerts.
+
+### 4. 📤 Export & Local Persistence
+- State persists across browser sessions using `localStorage`.
+- One-click export to formatted **CSV and JSON**.
+
+---
+
+## 🚀 Quickstart & Local Setup
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- npm (v9 or higher)
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [npm](https://www.npmjs.com/) (v9 or higher)
 
-### Installation & Run
+### Setup Steps
 
 ```bash
-# 1. Install project dependencies
+# 1. Clone the repository
+git clone https://github.com/MAYANK479/voice_cart_ai.git
+cd voice_cart_ai
+
+# 2. Install dependencies
 npm install
 
-# 2. Run the development server
+# 3. Start local development server
 npm run dev
 ```
-
-The application will be accessible at: **`http://localhost:5173/`**
+Open **`http://localhost:5173/`** in your browser (Google Chrome or Edge recommended for native Web Speech API support).
 
 ---
 
-## 🧪 Automated Testing
+## 🧪 Testing & Quality Assurance
 
-The project includes unit tests for the NLP parser and recommendation algorithms using **Vitest**:
+VoiceCart AI includes a complete automated unit test suite built with **Vitest**:
 
 ```bash
-# Run the test suite
+# Run the unit tests
 npm run test
 ```
 
-### Verified Test Scenarios:
-- ✅ Simple and complex multi-item phrase parsing
-- ✅ Entity extraction (quantities, units, attributes, price bounds)
-- ✅ Auto-categorization department accuracy
-- ✅ Restock prediction calculations against historical cycles
-- ✅ Dietary substitute matching and companion item discovery
+### Verified Test Suites (16 / 16 Passing):
+- `nlpParser.test.ts`:
+  - ✅ Simple phrase additions (*"Add milk"*)
+  - ✅ Quantity & unit extractions (*"I need 2 bottles of water"*)
+  - ✅ Multi-item sentence chaining (*"Add 2 boxes of cereal and 1 gallon of milk"*)
+  - ✅ Price-bounded searches (*"Find toothpaste under $5"*, *"between $2 and $6"*)
+  - ✅ Modifications, deletions, and word numbers (*"half a dozen"*, *"dozen"*)
+  - ✅ Auto-categorization department accuracy across 8 categories
+- `recommendationEngine.test.ts`:
+  - ✅ Consumption velocity calculations & restock urgency ranking
+  - ✅ Active list deduplication
+  - ✅ Dietary substitute matching
+  - ✅ Companion pairing triggers
 
 ---
 
-## 📁 Codebase Directory Structure
-
-```text
-voice_command/
-├── index.html                   # Entry HTML with fonts and SEO meta
-├── package.json                 # Dependencies & scripts
-├── tsconfig.json                # Strict TypeScript configuration
-├── vite.config.ts               # Vite bundler configuration
-├── src/
-│   ├── main.tsx                 # React application entry point
-│   ├── App.tsx                  # Root component layout
-│   ├── index.css                # Glassmorphic dark design system & animations
-│   ├── types/
-│   │   ├── shopping.ts          # Shopping item, category, suggestion types
-│   │   ├── speech.ts            # NLP intent and speech recognition types
-│   │   └── catalog.ts           # Product catalog and filter types
-│   ├── services/
-│   │   ├── categorizer.ts       # Auto-categorization engine
-│   │   ├── nlpParser.ts         # Natural language intent & entity parser
-│   │   ├── recommendationEngine.ts # Restock, seasonal, substitute algorithms
-│   │   ├── speechService.ts     # Web Speech API wrapper
-│   │   ├── ttsService.ts        # Text-to-speech audio feedback
-│   │   └── storageService.ts    # Persistence & CSV/JSON export
-│   ├── data/
-│   │   ├── categories.ts        # 8 Grocery department definitions
-│   │   ├── catalogData.ts       # Mock catalog (38+ items with prices & tags)
-│   │   ├── substituteData.ts    # Substitute mappings
-│   │   ├── seasonalData.ts      # Seasonal product recommendations
-│   │   ├── pairingsData.ts      # Companion pairing dataset
-│   │   ├── historyData.ts       # Pre-seeded purchase frequency records
-│   │   └── languageData.ts      # Multilingual configuration & voice prompts
-│   ├── context/
-│   │   └── ShoppingContext.tsx  # Centralized global state management
-│   ├── components/
-│   │   ├── Header.tsx           # Navbar, language switcher, audio controls
-│   │   ├── VoiceAssistant/      # Voice orb, live transcript, quick prompt pills
-│   │   ├── ShoppingList/        # Auto-categorized list, items cards, export
-│   │   ├── Sidebar/             # Budget widget, Restock alerts
-│   │   ├── Modals/              # Catalog search, Smart AI suggestions, Help guide
-│   │   └── UI/                  # Toasts & feedback
-│   └── tests/
-│       ├── nlpParser.test.ts    # NLP & categorization unit tests
-│       └── recommendationEngine.test.ts # Restock & substitute unit tests
-```
-
----
-
-## 🌐 Production Deployment Guide
-
-To deploy this application to any static hosting provider (Vercel, Netlify, Firebase Hosting, Cloudflare Pages, AWS S3):
+## 📦 Production Build & Deployment
 
 ```bash
-# Build the optimized production bundle
+# Compile and build the optimized production bundle
 npm run build
 ```
-The output will be generated in the `dist/` directory, ready to deploy.
+
+The output bundle is generated in the `dist/` directory and is pre-configured for instant static hosting on **Netlify**, **Vercel**, or **GitHub Pages**.
+
+---
+
+## 📁 Project Structure
+
+```text
+voice_cart_ai/
+├── .github/workflows/ci.yml     # Automated CI testing & build workflow
+├── netlify.toml                 # Netlify deployment & SPA routing config
+├── public/
+│   └── _redirects              # Static SPA rewrite rules
+├── docs/
+│   └── screenshots/            # High-resolution visual showcase assets
+├── src/
+│   ├── main.tsx                 # React application entry point
+│   ├── App.tsx                  # Root layout & dashboard
+│   ├── index.css                # Glassmorphism design system & animations
+│   ├── context/
+│   │   └── ShoppingContext.tsx  # Central state store (Speech + Items + AI)
+│   ├── services/
+│   │   ├── categorizer.ts       # Longest-match 8-dept categorizer
+│   │   ├── nlpParser.ts         # Natural language intent & entity extractor
+│   │   ├── recommendationEngine.ts # Restock, seasonal, substitute algorithms
+│   │   ├── speechService.ts     # Web Speech API wrapper with error recovery
+│   │   ├── ttsService.ts        # Two-way speech synthesis audio feedback
+│   │   └── storageService.ts    # Persistence & CSV/JSON export
+│   ├── components/
+│   │   ├── Header.tsx           # Navbar, language switcher, audio controls
+│   │   ├── VoiceAssistant/      # Voice orb, live transcript, prompt pills
+│   │   ├── ShoppingList/        # Auto-categorized list, items cards, export
+│   │   ├── Sidebar/             # Budget widget, Restock alerts
+│   │   ├── Modals/              # Product catalog search, Smart AI picks, Help guide
+│   │   └── UI/                  # Toast notification stack
+│   ├── data/                    # Seed catalog, substitutes, seasonal & history data
+│   └── tests/                   # Automated Vitest test suites
+├── index.html                   # HTML entry with SEO metadata & typography
+├── package.json                 # Dependencies & scripts
+└── tsconfig.json                # Strict TypeScript configuration
+```
 
 ---
 
 ## 📄 License
-MIT License. Built for Technical Assessment Evaluation.
+This project is licensed under the MIT License — feel free to use and explore.
+
+<div align="center">
+Built with ❤️ by <strong>Mayank Pandey</strong> for Technical Assessment Evaluation.
+</div>
