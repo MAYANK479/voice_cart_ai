@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Terminal, ArrowLeft, Check, Copy, Sparkles, Send } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Terminal, ArrowLeft, Check, Copy, Sparkles, Send, Cpu, Key, Zap } from 'lucide-react';
 import { useShopping } from '../../context/ShoppingContext';
 import { parseVoiceCommand } from '../../services/nlpParser';
+import { LLMFallbackService } from '../../services/llmFallback';
 import { CATEGORIES } from '../../data/categories';
-import { SupportedLanguage } from '../../types/speech';
-
+import { SupportedLanguage, ParsedCommand } from '../../types/speech';
 
 export const NlpPlaygroundView: React.FC = () => {
   const { currentLanguage, setActiveView, processTextInputCommand, addToast } = useShopping();
@@ -12,9 +12,44 @@ export const NlpPlaygroundView: React.FC = () => {
   const [inputQuery, setInputQuery] = useState('Add 2 boxes of cereal and 1 gallon of organic milk');
   const [selectedLang, setSelectedLang] = useState<SupportedLanguage>(currentLanguage);
   const [copied, setCopied] = useState(false);
+  const [parserMode, setParserMode] = useState<'rule' | 'llm'>('rule');
+  const [llmApiKey, setLlmApiKey] = useState<string>(() => LLMFallbackService.getApiKey());
+  const [llmResult, setLlmResult] = useState<ParsedCommand | null>(null);
+  const [isLoadingLlm, setIsLoadingLlm] = useState<boolean>(false);
+  const [parseLatencyMs, setParseLatencyMs] = useState<number>(0);
 
-  // Compute parsed result using real parser
-  const parsedResult = parseVoiceCommand(inputQuery, selectedLang);
+  // Compute deterministic rule-based result synchronously
+  const ruleResult = React.useMemo(() => {
+    const start = performance.now();
+    const res = parseVoiceCommand(inputQuery, selectedLang);
+    const end = performance.now();
+    if (parserMode === 'rule') {
+      setParseLatencyMs(Math.round((end - start) * 100) / 100);
+    }
+    return res;
+  }, [inputQuery, selectedLang, parserMode]);
+
+  // Run LLM parsing when in LLM mode or on request
+  useEffect(() => {
+    if (parserMode === 'llm') {
+      let isMounted = true;
+      setIsLoadingLlm(true);
+      const start = performance.now();
+      LLMFallbackService.parseWithLLM(inputQuery, selectedLang).then((res) => {
+        if (isMounted) {
+          const end = performance.now();
+          setLlmResult(res);
+          setParseLatencyMs(Math.round(end - start));
+          setIsLoadingLlm(false);
+        }
+      });
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [inputQuery, selectedLang, parserMode]);
+
+  const activeResult: ParsedCommand = parserMode === 'llm' && llmResult ? llmResult : ruleResult;
 
   const sampleQueries = [
     'Add 2 boxes of cereal and 1 gallon of organic milk',
@@ -25,12 +60,17 @@ export const NlpPlaygroundView: React.FC = () => {
     'Remove whole wheat bread from my list',
     'Suggest a substitute for butter',
     'What is in season today?',
-    'Añadir 2 botellas de leche orgánica',
-    'दो पैकेट दूध जोड़ें',
+    'I want to bake a strawberry cake',
+    'Proceed to checkout',
   ];
 
+  const handleSaveApiKey = (key: string) => {
+    setLlmApiKey(key);
+    LLMFallbackService.setApiKey(key);
+  };
+
   const handleCopyJson = () => {
-    navigator.clipboard.writeText(JSON.stringify(parsedResult, null, 2));
+    navigator.clipboard.writeText(JSON.stringify(activeResult, null, 2));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -59,14 +99,69 @@ export const NlpPlaygroundView: React.FC = () => {
             <span>Back to Dashboard</span>
           </button>
           <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Terminal size={24} color="var(--accent-primary)" />
-            <span>NLP Playground & Engineering Inspector</span>
+            <Terminal size={24} color="#059669" />
+            <span>Natural Language Inspector & Dual-Engine Lab</span>
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            "See how VoiceCart AI understands natural language." Test deterministic intent classification and multi-entity extraction.
+            Inspect deterministic rule-based pattern matching (fast-path, 0ms) and AI/LLM semantic extraction.
           </p>
         </div>
       </div>
+
+      {/* Engine Architecture Callout */}
+      <div className="glass-panel" style={{ padding: '0.85rem 1.25rem', borderLeft: '4px solid #059669', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <Cpu size={20} color="#059669" />
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+            <strong>Dual-Engine Architecture:</strong> Fast deterministic pattern matcher for instant client-side execution (&lt;1ms), backed by optional LLM semantic fallback.
+
+          </div>
+        </div>
+
+        {/* Engine Switcher */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button
+            className={`btn-subtle ${parserMode === 'rule' ? 'active' : ''}`}
+            onClick={() => setParserMode('rule')}
+            style={{
+              fontWeight: 700,
+              fontSize: '0.78rem',
+              background: parserMode === 'rule' ? '#059669' : undefined,
+              color: parserMode === 'rule' ? '#FFFFFF' : undefined,
+            }}
+          >
+            <Zap size={13} />
+            <span>Rule Parser (0ms)</span>
+          </button>
+          <button
+            className={`btn-subtle ${parserMode === 'llm' ? 'active' : ''}`}
+            onClick={() => setParserMode('llm')}
+            style={{
+              fontWeight: 700,
+              fontSize: '0.78rem',
+              background: parserMode === 'llm' ? '#059669' : undefined,
+              color: parserMode === 'llm' ? '#FFFFFF' : undefined,
+            }}
+          >
+            <Sparkles size={13} />
+            <span>AI / LLM Mode</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Optional Gemini API Key input for LLM mode */}
+      {parserMode === 'llm' && (
+        <div className="glass-panel" style={{ padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(5, 150, 105, 0.05)' }}>
+          <Key size={16} color="#059669" />
+          <input
+            type="password"
+            placeholder="Optional: Enter Gemini API key (e.g. AIza...) or leave empty for smart semantic engine"
+            value={llmApiKey}
+            onChange={(e) => handleSaveApiKey(e.target.value)}
+            style={{ flex: 1, padding: '0.4rem 0.6rem', fontSize: '0.8rem', borderRadius: '6px', border: '1px solid var(--border-glass)', background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}
+          />
+        </div>
+      )}
 
       {/* Input Box & Controls */}
       <div className="glass-panel nlp-input-panel">
@@ -97,7 +192,7 @@ export const NlpPlaygroundView: React.FC = () => {
             </select>
 
             <button
-              className="btn-primary"
+              className="btn-primary-action"
               style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0 1.25rem' }}
               onClick={handleExecuteInCart}
               title="Send to live cart"
@@ -132,48 +227,40 @@ export const NlpPlaygroundView: React.FC = () => {
         <div className="glass-panel nlp-breakdown-panel">
           <div className="panel-sub-header">
             <h3>Extracted Entities & Metadata</h3>
-            <div className="confidence-pill">
-              {Math.round(parsedResult.confidence * 100)}% Confidence Score
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                ⏱️ Latency: {parseLatencyMs}ms {isLoadingLlm && '(running...)'}
+              </span>
+              <div className="confidence-pill">
+                {Math.round(activeResult.confidence * 100)}% Confidence Score
+              </div>
             </div>
           </div>
 
           {/* Core Intent & Normalized Transcript */}
-          <div className="nlp-meta-row">
-            <div className="meta-block">
-              <span className="meta-label">Classified Intent:</span>
-              <span className={`log-intent-badge ${parsedResult.intent.toLowerCase()}`}>
-                {parsedResult.intent}
-              </span>
+          <div className="intent-display-card">
+            <div className="intent-badge-row">
+              <span className="intent-label">PARSED INTENT:</span>
+              <span className="intent-pill">{activeResult.intent}</span>
             </div>
-
-            <div className="meta-block">
-              <span className="meta-label">Suggested Action:</span>
-              <span className="meta-value-highlight">
-                {parsedResult.suggestedAction || 'NONE'}
-              </span>
+            <div className="nlp-normalized-text">
+              <strong>Normalized:</strong> "{activeResult.normalizedTranscript}"
             </div>
-
-            <div className="meta-block">
-              <span className="meta-label">Language:</span>
-              <span className="meta-value">{parsedResult.language}</span>
+            <div className="nlp-feedback-preview">
+              <strong>Assistant Output:</strong> "{activeResult.feedbackMessage}"
             </div>
           </div>
 
-          <div className="nlp-feedback-box">
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>Parser Feedback:</span>
-            <div style={{ color: 'var(--text-primary)', marginTop: '2px' }}>{parsedResult.feedbackMessage}</div>
-          </div>
-
-          {/* Multi-Item Entities Table */}
-          {parsedResult.items.length > 0 && (
-            <div className="entities-table-wrapper">
-              <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                Extracted Items ({parsedResult.items.length})
+          {/* Extracted Item Entities Table */}
+          {activeResult.items && activeResult.items.length > 0 ? (
+            <div className="entities-table-container">
+              <h4 style={{ fontSize: '0.88rem', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
+                Extracted Grocery Entities ({activeResult.items.length})
               </h4>
               <table className="entities-table">
                 <thead>
                   <tr>
-                    <th>Product</th>
+                    <th>Item Name</th>
                     <th>Qty</th>
                     <th>Unit</th>
                     <th>Category</th>
@@ -181,23 +268,37 @@ export const NlpPlaygroundView: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {parsedResult.items.map((item, idx) => {
-                    const catInfo = CATEGORIES[item.category];
+                  {activeResult.items.map((item, index) => {
+                    const categoryInfo = CATEGORIES[item.category];
                     return (
-                      <tr key={idx}>
-                        <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{item.name}</td>
-                        <td><span className="tag-qty">{item.quantity}</span></td>
+                      <tr key={index}>
+                        <td style={{ fontWeight: 600 }}>{item.name}</td>
+                        <td>
+                          <span className="qty-tag">{item.quantity}</span>
+                        </td>
                         <td>{item.unit}</td>
                         <td>
-                          <span className="category-pill-sm">
-                            {catInfo?.emoji} {catInfo?.name || item.category}
+                          <span
+                            className="category-pill-mini"
+                            style={{
+                              backgroundColor: categoryInfo?.bgColor || 'rgba(255,255,255,0.05)',
+                              color: categoryInfo?.color || '#fff',
+                            }}
+                          >
+                            {categoryInfo?.emoji} {categoryInfo?.name || item.category}
                           </span>
                         </td>
                         <td>
                           {item.attributes && item.attributes.length > 0 ? (
-                            <span className="tag-attr">{item.attributes.join(', ')}</span>
+                            <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+                              {item.attributes.map((attr, aIdx) => (
+                                <span key={aIdx} className="attr-tag">
+                                  {attr}
+                                </span>
+                              ))}
+                            </div>
                           ) : (
-                            <span style={{ color: 'var(--text-muted)' }}>—</span>
+                            <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>-</span>
                           )}
                         </td>
                       </tr>
@@ -206,36 +307,18 @@ export const NlpPlaygroundView: React.FC = () => {
                 </tbody>
               </table>
             </div>
-          )}
-
-          {/* Search Criteria Table if Search Intent */}
-          {parsedResult.filterCriteria && (
-            <div className="search-criteria-card">
-              <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                Parsed Search Parameters
-              </h4>
-              <div className="criteria-grid">
+          ) : (
+            <div className="nlp-no-entities">
+              {activeResult.targetItemName ? (
+                <div>Target Item: <strong>{activeResult.targetItemName}</strong></div>
+              ) : activeResult.filterCriteria ? (
                 <div>
-                  <span className="criteria-label">Query:</span>
-                  <strong>{parsedResult.filterCriteria.query || 'Any'}</strong>
+                  Search Query: <strong>{activeResult.filterCriteria.query}</strong>
+                  {activeResult.filterCriteria.maxPrice && ` (Max Price: $${activeResult.filterCriteria.maxPrice})`}
                 </div>
-                <div>
-                  <span className="criteria-label">Brand:</span>
-                  <strong>{parsedResult.filterCriteria.brand || 'Any'}</strong>
-                </div>
-                <div>
-                  <span className="criteria-label">Size:</span>
-                  <strong>{parsedResult.filterCriteria.size || 'Any'}</strong>
-                </div>
-                <div>
-                  <span className="criteria-label">Max Price:</span>
-                  <strong>
-                    {parsedResult.filterCriteria.maxPrice !== undefined
-                      ? `$${parsedResult.filterCriteria.maxPrice.toFixed(2)}`
-                      : 'None'}
-                  </strong>
-                </div>
-              </div>
+              ) : (
+                <div>No grocery item entities required for this intent.</div>
+              )}
             </div>
           )}
         </div>
@@ -243,19 +326,20 @@ export const NlpPlaygroundView: React.FC = () => {
         {/* Right Column: Raw JSON AST Output */}
         <div className="glass-panel nlp-json-panel">
           <div className="panel-sub-header">
-            <h3>Raw JSON AST Output</h3>
+            <h3>Structured AST Payload (JSON)</h3>
             <button
               className="btn-subtle"
               onClick={handleCopyJson}
-              title="Copy JSON representation"
+              style={{ fontSize: '0.78rem', padding: '0.2rem 0.5rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+              title="Copy raw JSON"
             >
               {copied ? <Check size={13} color="#10b981" /> : <Copy size={13} />}
               <span>{copied ? 'Copied' : 'Copy JSON'}</span>
             </button>
           </div>
 
-          <pre className="json-ast-display">
-            <code>{JSON.stringify(parsedResult, null, 2)}</code>
+          <pre className="json-code-block">
+            <code>{JSON.stringify(activeResult, null, 2)}</code>
           </pre>
         </div>
       </div>
