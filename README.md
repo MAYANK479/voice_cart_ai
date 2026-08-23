@@ -1,34 +1,31 @@
-# VoiceCart AI — Intelligent Voice-Enabled Grocery Assistant
+# VoiceCart AI — Voice-Enabled Grocery Shopping Assistant
 
 [![CI](https://github.com/MAYANK479/voice_cart_ai/actions/workflows/ci.yml/badge.svg)](https://github.com/MAYANK479/voice_cart_ai/actions/workflows/ci.yml)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Netlify-00C7B7?style=flat&logo=netlify&logoColor=white)](https://voicecommandai.netlify.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=flat&logo=vercel&logoColor=white)](https://voice-cart-ai-opal.vercel.app/)
 [![React 18](https://img.shields.io/badge/React-18.3-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Vitest](https://img.shields.io/badge/Tests-57%20Passing-10B981?style=flat&logo=vitest&logoColor=white)](https://vitest.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**[🌐 Live Demo (voicecommandai.netlify.app)](https://voicecommandai.netlify.app)** • **[System Architecture](#system-architecture)** • **[Testing Suite](#testing--quality-assurance)** • **[Voice Command Reference](#supported-voice-commands)** • **[Known Limitations](#known-limitations)**
+**[Live Demo](https://voice-cart-ai-opal.vercel.app/)** • **[Architecture](#system-architecture)** • **[Voice Command Reference](#supported-voice-commands)** • **[Error Handling & Accessibility](#error-handling--accessibility)** • **[Testing](#testing--quality-assurance)** • **[Local Setup](#quickstart--local-setup)**
 
 ---
 
-## Project Overview & Technical Approach
+## Overview
 
-> **VoiceCart AI** is a client-side grocery shopping assistant built with **React 18, TypeScript, and Vite**. The platform pairs the browser's native **Web Speech API** with a high-throughput, deterministic rule-based intent and entity parser that extracts compound quantities (*"half a dozen"*), units, brands, dietary tags (*"organic"*), price bounds (*"under $5"*), and target lists with sub-millisecond execution. An optional semantic fallback handles complex conversational recipe requests.
->
-> For grocery intelligence, VoiceCart AI provides:
-> 1. **Predictive Restock & Smart Basket**: Calculates consumption velocity from purchase history to forecast depletion dates and assemble a personalized smart basket in one click.
-> 2. **Deterministic Auto-Categorization**: Organizes items into 8 supermarket aisles using longest-match token heuristics.
-> 3. **Smart Substitutes & Pairings**: Offers dietary, allergen, and budget alternatives alongside meal pairings.
-> 4. **End-to-End Grocery Checkout**: Full order review with delivery time slots, coupon verification, live tracking simulation, and printable receipts.
->
-> The application runs entirely client-side without proprietary backend overhead, features zero-latency feedback, includes 57 automated tests, and adheres to a clean, warm design system.
+**VoiceCart AI** is a client-side grocery shopping web application built with **React 18, TypeScript, and Vite**. The system integrates the browser's native **Web Speech API** with a deterministic natural language parser that tokenizes speech transcripts into structured shopping actions (item names, compound quantities, units, brands, dietary tags, price bounds, and target lists) with sub-millisecond execution.
+
+### Key Capabilities
+1. **Predictive Restock & Smart Basket**: Calculates consumption velocity from purchase history to forecast depletion dates and pre-populate recurring staples.
+2. **Deterministic Department Categorization**: Automatically routes items into 8 supermarket aisles using longest-match phrase resolution.
+3. **Smart Substitutes & Meal Pairings**: Provides dietary, allergen, and budget alternatives alongside meal companion suggestions.
+4. **End-to-End Grocery Checkout**: Order review with delivery time slots, coupon verification, order tracking simulation, and printable receipts.
+5. **Interactive NLP Engineering Inspector**: A developer playground to inspect AST token outputs and compare deterministic regex execution against optional semantic parsing.
 
 ---
 
 ## System Architecture
-
-VoiceCart AI is structured with a strict separation of concerns across speech ingestion, intent resolution, domain intelligence, and reactive state management:
 
 ```mermaid
 graph TD
@@ -36,7 +33,7 @@ graph TD
     B --> C[Dual-Engine Intent & Entity Parser]
     
     C -->|Fast-Path 0ms| C1[Deterministic Rule/Regex Parser]
-    C -->|Complex Phrasing / Recipe| C2[Semantic Parser Fallback]
+    C -->|Complex Conversational Queries| C2[Semantic Parser Fallback]
     
     C1 --> D{Intent Dispatcher}
     C2 --> D
@@ -62,10 +59,10 @@ graph TD
     H --> L[Spending Analytics & History Audit Logs]
 ```
 
-
-### Architectural Tradeoff: Deterministic Parser vs External LLM
-- **Fast-Path Deterministic Parser**: Operates with **0ms network latency**, **$0 compute cost**, and deterministic repeatability for common grocery operations (*"Add 2 gallons of milk and 6 eggs"*).
-- **LLM Semantic Fallback**: Available in the NLP Lab and when confidence is low, enabling extraction from free-form conversational queries (*"I want to bake a strawberry cake"*).
+### Architectural Decisions & Tradeoffs
+- **Deterministic Rule Engine (Primary)**: Handles 95%+ of structured shopping commands (*"Add 2 boxes of cereal and 1 gallon of milk"*) in **<1ms with 0 network overhead** and deterministic test coverage.
+- **Semantic Fallback (Secondary)**: Used for unstructured, multi-ingredient recipe requests (*"I want to bake a strawberry cake"*).
+- **Client-Side State & Storage**: State is managed via React Context and persisted in LocalStorage with optimistic updates and undo recovery.
 
 ---
 
@@ -83,7 +80,7 @@ The parser supports continuous voice input across **5 languages** (English, Span
 | **Predictive Restock** | `"What should I restock?"` | Opens velocity-calculated restock prediction modal |
 | **Smart Substitutes** | `"Suggest a substitute for butter"` | Opens dietary/allergen alternative recommendation modal |
 | **Seasonal & Deals** | `"What is in season today?"` | Displays peak-harvest seasonal produce and promotional discounts |
-| **Modify Quantity** | `"Change apples quantity to 5"` | Updates quantity with voice feedback |
+| **Modify Quantity** | `"Change apples quantity to 5"` | Updates quantity with audio and visual feedback |
 | **Remove / Delete** | `"Remove milk from my list"` | Deletes item with 1-click Undo toast protection |
 | **Multi-List Routing** | `"Add coffee to office list"` | Directs item to the target list (`office`, `party`, etc.) |
 | **Checkout & Order** | `"Proceed to checkout"` / `"Order now"` | Routes to the order verification and delivery checkout page |
@@ -92,81 +89,38 @@ The parser supports continuous voice input across **5 languages** (English, Span
 
 ---
 
-## Core Feature Pillars
+## Error Handling & Accessibility
 
-### 1. Smart Restock & Smart Basket ("Build My List")
-- **Consumption Velocity Algorithm**: Compares elapsed days against mean purchase cycle to prioritize items approaching depletion (e.g. Milk consumed every 7 days $\rightarrow$ highlighted at Day 6).
-- **1-Click Smart Basket**: Assembles habit-driven staples into a personalized basket with batch addition.
+### Speech Recognition Resilience
+- **Permission Denied (`not-allowed`)**: Detects blocked microphone permissions and displays clear browser-level unblock instructions alongside the keyboard fallback input.
+- **No Speech Detected (`no-speech`)**: Gracefully resets speech status to idle after timeout without triggering error banners.
+- **Network Interruption (`network`)**: Catches speech synthesis and recognition drops, preserving local list state and notifying the user.
+- **Audio Feedback Controls**: Speech synthesis volume and feedback can be toggled on/off at any time via the header mute control.
 
-### 2. Supermarket 8-Department Categorization
-- Organizes items into: **Produce, Dairy & Eggs, Bakery, Meat & Seafood, Pantry, Beverages, Snacks, and Household**.
-- Uses longest-match compound phrase resolution (e.g., *"Orange Juice"* $\rightarrow$ Beverages, *"Fresh Orange"* $\rightarrow$ Produce).
-
-### 3. Dedicated NLP Engineering Inspector (NLP Lab)
-- Interactive engineering playground allowing developers to test phrasing, inspect extracted entity tokens, compare rule-based vs LLM parsing latency, and copy the raw JSON Abstract Syntax Tree (AST).
-
-### 4. Modern Grocery Checkout & Order Fulfillment
-- Order review with item selection checklists, quantity adjustments, delivery slot options (Standard, Express 1-Hour, Store Pickup), coupon code validator (`VOICECART10`, `FREESHIP`), simulated live order tracking, and printable receipts.
-
-### 5. Spending Analytics & Budget Management
-- Live budget tracking widget with progress visuals, over-budget indicators, spending distribution charts, and undo-protected deletions.
+### Accessibility (a11y) & Keyboard Navigation
+- **Keyboard Fallback Bar**: Users without microphone access can type natural language commands directly with full keyboard focus management (`Enter` to submit, `Esc` to dismiss modals).
+- **ARIA Live Regions**: Screen readers receive dynamic transcript updates via `aria-live="polite"` regions.
+- **High-Contrast Theme Palette**: Full light (`Softly Day`) and dark (`Softly Dusk`) themes adhering to WCAG AA color contrast ratios.
+- **Optimistic State with Undo Protection**: Destructive actions (deleting an item, clearing lists) display an immediate undo toast to prevent accidental data loss.
 
 ---
 
 ## Testing & Quality Assurance
 
-VoiceCart AI includes an automated unit test suite executed with **Vitest**:
+VoiceCart AI includes an automated test suite executed with **Vitest**:
 
 ```bash
-# Run the complete test suite
 npm test
 ```
 
-### Verified Test Summary (57 / 57 Passing across 7 Test Suites):
-- `src/tests/nlpParser.test.ts` (15 tests)
-  - Multi-item sentence chaining (*"Add 2 boxes of cereal and 1 gallon of milk"*)
-  - Word numbers and fractional quantities (*"half a dozen"*, *"dozen"*)
-  - Price bounds (*"under $5"*, *"between $2 and $6"*)
-  - Brand and size parsing (*"Colgate"*, *"large"*)
-  - Multilingual command extraction (Spanish, Hindi)
-  - Deterministic confidence scoring
-- `src/tests/checkout.test.ts` (14 tests)
-  - Order subtotal calculations for selected/unselected items
-  - Promo code discounts (`VOICECART10`, `HARVEST15`, `FREESHIP`)
-  - Free delivery threshold verification (>$35) and express tier
-  - Estimated tax (8%) and grand total computations
-  - Item quantity increment/decrement bounds and receipt ID generation
-- `src/tests/multiListAndSmartBasket.test.ts` (7 tests)
-  - Target list extraction (*"to party list"*, *"to office list"*)
-  - Checkout voice intent routing
-  - Smart basket generation from historical purchase frequency
-- `src/tests/storageAndHistory.test.ts` (6 tests)
-  - LocalStorage persistence and migration defaults
-  - Undo deletion recovery
-- `src/tests/categorizer.test.ts` (6 tests)
-  - Department categorization (8 supermarket aisles)
-  - Price estimation bounds and category emoji mapping
-- `src/tests/llmFallback.test.ts` (5 tests)
-  - AI semantic fallback and multi-ingredient recipe bundle generation
-  - Natural phrasing removal, search, and budget resolution
-- `src/tests/recommendationEngine.test.ts` (4 tests)
-  - Depletion date prediction from consumption velocity
-  - Active list deduplication and dietary substitute matching
-
-
----
-
-## Known Limitations
-
-1. **Speech Recognition Browser Support**: Voice recognition utilizes the standard W3C Web Speech API (`webkitSpeechRecognition`), supported natively in Google Chrome, Microsoft Edge, Brave, Android Chrome, and Safari (desktop & iOS with microphone permissions). Firefox currently lacks full Web Speech recognition support.
-2. **Internet Connection for Speech Recognition**: While the UI and parsing engine run entirely client-side, the browser's speech-to-text service streams audio to transcription services in Chromium browsers.
-3. **Curated Seed Catalog**: The 50+ item product catalog and pricing are curated benchmark data modeled after standard supermarket inventory distributions.
-
----
-
-## Data Sources & Modeling
-
-The product catalog (`src/data/catalogData.ts`), historical consumption frequency (`src/data/historyData.ts`), and nutritional pairings (`src/data/pairingsData.ts`) are structured based on USDA food categories and retail grocery pricing averages.
+### Verified Test Suite (57 Passing Tests across 7 Modules):
+- **`nlpParser.test.ts`** (15 tests) — Multi-item chaining, word numbers, fractions, price bounds, brand/size tags, and multilingual token parsing.
+- **`checkout.test.ts`** (14 tests) — Subtotal math, promo code verification (`VOICECART10`, `HARVEST15`), shipping tier thresholds, and tax.
+- **`multiListAndSmartBasket.test.ts`** (7 tests) — Multiple list routing and consumption velocity smart basket generation.
+- **`storageAndHistory.test.ts`** (6 tests) — LocalStorage persistence and undo recovery.
+- **`categorizer.test.ts`** (6 tests) — Supermarket aisle classification (8 departments), category emoji mapping, and price estimation.
+- **`llmFallback.test.ts`** (5 tests) — Semantic fallback and recipe ingredient bundle extraction.
+- **`recommendationEngine.test.ts`** (4 tests) — Depletion velocity forecasting and dietary substitute matching.
 
 ---
 
@@ -195,10 +149,11 @@ Open **`http://localhost:5173/`** in Google Chrome or Microsoft Edge.
 npm run build
 ```
 
-Bundle is generated in `dist/` with zero build warnings and is ready for static deployment on Netlify, Vercel, or GitHub Pages.
+Bundle is output to `dist/` with 0 warnings/errors.
 
 ---
 
 ## License
 
-MIT License. Designed and developed by **Mayank Pandey**.
+MIT License. Developed by **Mayank Pandey**.
+
