@@ -47,10 +47,22 @@ const PROMO_CARDS: PromoCard[] = [
 ];
 
 export const DiscountBanners: React.FC = () => {
-  const { processTextInputCommand, setSuggestionsModalOpen } = useShopping();
+  const { setCatalogSearchQuery, setCatalogModalOpen, setSuggestionsInitialTab, setSuggestionsModalOpen } = useShopping();
 
-  const handleShopNow = (cmd: string) => {
-    processTextInputCommand(cmd, 'demo');
+  const handleShopNow = (promo: PromoCard) => {
+    if (promo.id === 'promo-1') {
+      setCatalogSearchQuery('organic');
+      setCatalogModalOpen(true);
+    } else if (promo.id === 'promo-2') {
+      setSuggestionsInitialTab('restock');
+      setSuggestionsModalOpen(true);
+    } else if (promo.id === 'promo-3') {
+      setSuggestionsInitialTab('substitutes');
+      setSuggestionsModalOpen(true);
+    } else {
+      setCatalogSearchQuery('bread');
+      setCatalogModalOpen(true);
+    }
   };
 
   return (
@@ -74,7 +86,7 @@ export const DiscountBanners: React.FC = () => {
               <h3 className="simi-discount-title">{card.title}</h3>
               <p className="simi-discount-sub">{card.subtitle}</p>
             </div>
-            <button className="btn-shop-now" onClick={() => handleShopNow(card.command)}>
+            <button className="btn-shop-now" onClick={() => handleShopNow(card)}>
               <span>Shop Now</span>
               <Sparkles size={12} />
             </button>
@@ -84,3 +96,4 @@ export const DiscountBanners: React.FC = () => {
     </div>
   );
 };
+

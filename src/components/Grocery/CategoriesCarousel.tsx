@@ -22,11 +22,13 @@ const GROCERY_CATEGORIES: CategoryPill[] = [
 ];
 
 export const CategoriesCarousel: React.FC = () => {
-  const { setCatalogModalOpen, processTextInputCommand } = useShopping();
+  const { setCatalogModalOpen, setCatalogSearchQuery } = useShopping();
 
-  const handleCategoryClick = (catName: string) => {
-    processTextInputCommand(`Find ${catName}`, 'demo');
+  const handleCategoryClick = (cat: CategoryPill) => {
+    setCatalogSearchQuery(cat.name.split(' ')[0]);
+    setCatalogModalOpen(true);
   };
+
 
   return (
     <div className="simi-categories-section">
@@ -53,8 +55,9 @@ export const CategoriesCarousel: React.FC = () => {
           <div
             key={cat.id}
             className="simi-category-card"
-            onClick={() => handleCategoryClick(cat.name)}
+            onClick={() => handleCategoryClick(cat)}
             title={`Browse ${cat.name}`}
+
           >
             <div className="simi-category-icon-box" style={{ backgroundColor: cat.bgColor }}>
               <span className="simi-category-emoji">{cat.emoji}</span>

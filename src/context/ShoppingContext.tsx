@@ -338,10 +338,10 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         title: 'Item Restored',
         message: `Restored "${lastDeletedItem.name}" to your shopping list.`,
       });
-      ttsService.speak(`Restored ${lastDeletedItem.name}`);
       setLastDeletedItem(null);
     }
   }, [lastDeletedItem, addToast]);
+
 
   // Shopping List Operations
   const addItem = useCallback(
@@ -610,6 +610,8 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       };
       setCommandLogs((prev) => [logEntry, ...prev]);
 
+      const shouldSpeak = source === 'voice' && ttsEnabled;
+
       switch (cmd.intent) {
         case 'ADD_ITEM': {
           cmd.items.forEach((itemEntity: ParsedItemEntity) => {
@@ -631,13 +633,18 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             title: 'Voice Command: Add',
             message: cmd.feedbackMessage,
           });
-          ttsService.speak(cmd.feedbackMessage);
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
           break;
         }
 
         case 'REMOVE_ITEM': {
           if (cmd.targetItemName) {
             removeItem(cmd.targetItemName);
+          }
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
           }
           break;
         }
@@ -646,16 +653,25 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           if (cmd.targetItemName && cmd.items.length > 0) {
             updateQuantity(cmd.targetItemName, cmd.items[0].quantity, cmd.items[0].unit);
           }
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
           break;
         }
 
         case 'CLEAR_COMPLETED': {
           clearCompleted();
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
           break;
         }
 
         case 'CLEAR_ALL': {
           clearAll();
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
           break;
         }
 
@@ -669,7 +685,9 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             title: 'Catalog Search',
             message: cmd.feedbackMessage,
           });
-          ttsService.speak(cmd.feedbackMessage);
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
           break;
         }
 
@@ -681,7 +699,9 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             title: 'Seasonal Recommendations',
             message: cmd.feedbackMessage,
           });
-          ttsService.speak(cmd.feedbackMessage);
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
           break;
         }
 
@@ -693,7 +713,9 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             title: 'Smart Restock Suggestions',
             message: cmd.feedbackMessage,
           });
-          ttsService.speak(cmd.feedbackMessage);
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
           break;
         }
 
@@ -705,7 +727,9 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             title: 'Substitutes Finder',
             message: cmd.feedbackMessage,
           });
-          ttsService.speak(cmd.feedbackMessage);
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
           break;
         }
 
@@ -716,7 +740,9 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             title: 'Voice Command Help',
             message: cmd.feedbackMessage,
           });
-          ttsService.speak(cmd.feedbackMessage);
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
           break;
         }
 
@@ -727,13 +753,16 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             title: 'Command Not Recognized',
             message: cmd.feedbackMessage,
           });
-          ttsService.speak(cmd.feedbackMessage);
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
           break;
         }
       }
     },
-    [addItem, removeItem, updateQuantity, clearCompleted, clearAll, addToast]
+    [addItem, removeItem, updateQuantity, clearCompleted, clearAll, addToast, ttsEnabled]
   );
+
 
   // Initialize Speech Listeners
   useEffect(() => {
