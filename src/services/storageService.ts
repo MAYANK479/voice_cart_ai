@@ -329,14 +329,12 @@ export const storageService = {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.THEME) as 'dark' | 'light';
       if (data === 'dark' || data === 'light') return data;
-      if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-        return 'light';
-      }
-      return 'dark';
+      return 'light'; // Default to Softly Day light theme
     } catch {
-      return 'dark';
+      return 'light';
     }
   },
+
 
   saveTheme(theme: 'dark' | 'light'): void {
     try {
