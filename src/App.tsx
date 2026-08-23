@@ -24,9 +24,14 @@ const AppContent: React.FC = () => {
   const { activeView } = useShopping();
 
   return (
-    <div className="app-container">
-      {/* Navigation & Actions Header */}
-      <Header />
+    <>
+      {/* Global Tactile Grain Texture Overlay */}
+      <div className="grain-overlay" aria-hidden="true" />
+
+      <div className="app-container">
+        {/* Navigation & Actions Header */}
+        <Header />
+
 
       {/* Dynamic View Router */}
       {activeView === 'dashboard' && (
@@ -76,8 +81,10 @@ const AppContent: React.FC = () => {
       {/* Global Toast Feedback Stack */}
       <ToastContainer />
     </div>
+  </>
   );
 };
+
 
 
 export const App: React.FC = () => {

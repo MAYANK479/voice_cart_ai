@@ -19,11 +19,15 @@ export const CategorySection: React.FC<CategorySectionProps> = ({ categoryId, it
       <div className="category-header">
         <div className="category-title-badge">
           <span>{categoryInfo.emoji}</span>
-          <span style={{ color: categoryInfo.color }}>{categoryInfo.name}</span>
+          <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{categoryInfo.name}</span>
           <span className="badge-counter" style={{ background: categoryInfo.bgColor, color: categoryInfo.color, borderColor: categoryInfo.color }}>
             {items.length}
           </span>
+          <span style={{ fontFamily: 'var(--font-accent)', fontSize: '1.2rem', color: 'var(--text-muted)', marginLeft: '0.2rem', opacity: 0.85 }}>
+            fresh
+          </span>
         </div>
+
 
         <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)' }}>
           Subtotal: <strong style={{ color: 'var(--text-primary)' }}>${categoryTotal.toFixed(2)}</strong>

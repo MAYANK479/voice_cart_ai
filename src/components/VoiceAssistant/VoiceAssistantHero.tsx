@@ -50,8 +50,15 @@ export const VoiceAssistantHero: React.FC = () => {
 
   return (
     <section className="glass-panel hero-command-deck" aria-label="AI Voice Command Center">
+      {/* Softly Floating Ambient Blobs */}
+      <div className="hero-floating-blobs" aria-hidden="true">
+        <div className="hero-blob blob-1" />
+        <div className="hero-blob blob-2" />
+      </div>
+
       {/* Top Banner: Greeting & Voice Assistant Orb */}
-      <div className="deck-top-row">
+      <div className="deck-top-row" style={{ position: 'relative', zIndex: 1 }}>
+
         <div className="deck-title-area">
           <div className="deck-greeting-badge">
             <span className="deck-glow-dot" />
