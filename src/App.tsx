@@ -13,8 +13,10 @@ import { ToastContainer } from './components/UI/ToastContainer';
 import { InsightsView } from './components/Insights/InsightsView';
 import { HistoryView } from './components/History/HistoryView';
 import { NlpPlaygroundView } from './components/NlpLab/NlpPlaygroundView';
+import { CheckoutView } from './components/Checkout/CheckoutView';
 
 import { CategoriesCarousel } from './components/Grocery/CategoriesCarousel';
+
 import { PopularProductsGrid } from './components/Grocery/PopularProductsGrid';
 import { DiscountBanners } from './components/Grocery/DiscountBanners';
 
@@ -61,6 +63,9 @@ const AppContent: React.FC = () => {
       {activeView === 'history' && <HistoryView />}
 
       {activeView === 'nlp-lab' && <NlpPlaygroundView />}
+
+      {activeView === 'checkout' && <CheckoutView />}
+
 
       {/* Interactive Modals */}
       <CatalogModal />

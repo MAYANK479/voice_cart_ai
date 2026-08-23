@@ -11,9 +11,11 @@ import {
   History,
   Terminal,
   LayoutDashboard,
+  ShoppingCart,
   Sun,
   Moon,
 } from 'lucide-react';
+
 import { useShopping } from '../context/ShoppingContext';
 import { SUPPORTED_LANGUAGES } from '../data/languageData';
 import { SupportedLanguage } from '../types/speech';
@@ -90,7 +92,18 @@ export const Header: React.FC = () => {
           <Terminal size={15} />
           <span>NLP Lab</span>
         </button>
+
+        <button
+          className={`nav-tab-btn checkout-tab ${activeView === 'checkout' ? 'active' : ''}`}
+          onClick={() => setActiveView('checkout')}
+          aria-current={activeView === 'checkout' ? 'page' : undefined}
+        >
+          <ShoppingCart size={15} />
+          <span>Checkout</span>
+          {items.length > 0 && <span className="tab-badge-checkout">{items.length}</span>}
+        </button>
       </nav>
+
 
       {/* Action Controls & Utilities */}
       <div className="header-actions">

@@ -3,8 +3,9 @@ import { DollarSign, AlertTriangle, Edit2, Check } from 'lucide-react';
 import { useShopping } from '../../context/ShoppingContext';
 
 export const BudgetTrackerWidget: React.FC = () => {
-  const { budget, setBudget, totalEstimatedCost, completedEstimatedCost, pendingCount } = useShopping();
+  const { budget, setBudget, totalEstimatedCost, completedEstimatedCost, pendingCount, setActiveView } = useShopping();
   const [isEditing, setIsEditing] = useState(false);
+
   const [newBudget, setNewBudget] = useState(budget.toString());
 
   const percentage = Math.min(100, Math.round((totalEstimatedCost / budget) * 100)) || 0;
@@ -101,6 +102,15 @@ export const BudgetTrackerWidget: React.FC = () => {
         <span>Pending items: {pendingCount}</span>
         <span>Checked total: ${completedEstimatedCost.toFixed(2)}</span>
       </div>
+
+      <button
+        className="btn-checkout-cta"
+        onClick={() => setActiveView('checkout')}
+        style={{ marginTop: '0.85rem', width: '100%' }}
+      >
+        <span>🛒 Proceed to Checkout (${totalEstimatedCost.toFixed(2)})</span>
+      </button>
     </div>
   );
 };
+

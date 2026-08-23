@@ -1,4 +1,5 @@
-export type ActiveView = 'dashboard' | 'insights' | 'history' | 'nlp-lab';
+export type ActiveView = 'dashboard' | 'insights' | 'history' | 'nlp-lab' | 'checkout';
+
 
 export type CategoryId =
   | 'produce'

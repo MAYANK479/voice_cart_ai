@@ -23,8 +23,10 @@ export type IntentType =
   | 'GET_SUGGESTIONS'
   | 'GET_SUBSTITUTE'
   | 'GET_SEASONAL'
+  | 'CHECKOUT'
   | 'HELP'
   | 'UNKNOWN';
+
 
 export interface ParsedItemEntity {
   name: string;
@@ -58,7 +60,8 @@ export interface ParsedCommand {
   };
   targetItemName?: string;
   feedbackMessage: string;
-  suggestedAction?: 'ADD' | 'REMOVE' | 'MODIFY' | 'SEARCH' | 'SUBSTITUTE' | 'SEASONAL' | 'RESTOCK';
+  suggestedAction?: 'ADD' | 'REMOVE' | 'MODIFY' | 'SEARCH' | 'SUBSTITUTE' | 'SEASONAL' | 'RESTOCK' | 'CHECKOUT';
+
 }
 
 

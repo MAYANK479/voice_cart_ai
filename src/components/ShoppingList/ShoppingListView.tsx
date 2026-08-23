@@ -16,9 +16,11 @@ export const ShoppingListView: React.FC = () => {
     clearAll,
     exportList,
     setBuildMyListModalOpen,
+    setActiveView,
     completedCount,
     totalEstimatedCost,
   } = useShopping();
+
 
 
   // Group active list items by category in predefined order
@@ -151,15 +153,28 @@ export const ShoppingListView: React.FC = () => {
           </button>
         </div>
       ) : (
-        <div className="categories-stack">
-          {DEFAULT_CATEGORY_ORDER.map((categoryId) => {
-            const categoryItems = groupedItems[categoryId];
-            if (!categoryItems || categoryItems.length === 0) return null;
-            return <CategorySection key={categoryId} categoryId={categoryId} items={categoryItems} />;
-          })}
-        </div>
+        <>
+          <div className="categories-stack">
+            {DEFAULT_CATEGORY_ORDER.map((categoryId) => {
+              const categoryItems = groupedItems[categoryId];
+              if (!categoryItems || categoryItems.length === 0) return null;
+              return <CategorySection key={categoryId} categoryId={categoryId} items={categoryItems} />;
+            })}
+          </div>
+
+          <div style={{ marginTop: '1.25rem' }}>
+            <button
+              className="btn-place-order"
+              onClick={() => setActiveView('checkout')}
+              style={{ width: '100%' }}
+            >
+              <span>🛒 Proceed to Checkout ({activeListItems.length} items • ${totalEstimatedCost.toFixed(2)}) →</span>
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
 };
+
 

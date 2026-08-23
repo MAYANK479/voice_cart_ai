@@ -738,7 +738,21 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           break;
         }
 
+        case 'CHECKOUT': {
+          setActiveView('checkout');
+          addToast({
+            type: 'info',
+            title: 'Checkout',
+            message: cmd.feedbackMessage,
+          });
+          if (shouldSpeak) {
+            ttsService.speak(cmd.feedbackMessage);
+          }
+          break;
+        }
+
         case 'HELP': {
+
           setHelpModalOpen(true);
           addToast({
             type: 'info',

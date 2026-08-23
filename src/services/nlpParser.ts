@@ -239,7 +239,17 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
     return result;
   }
 
+  // 3.5. CHECKOUT & ORDER REVIEW INTENT
+  if (/\b(checkout|check\s*out|order\s+now|pay\s+now|proceed\s+to\s+checkout|place\s+order|buy\s+now|review\s+order)\b/i.test(lower)) {
+    result.intent = 'CHECKOUT';
+    result.confidence = 0.98;
+    result.suggestedAction = 'CHECKOUT';
+    result.feedbackMessage = 'Opening checkout & order review for your cart.';
+    return result;
+  }
+
   // 4. RESTOCK / SMART SUGGESTIONS INTENT
+
   if (
     /(what (should|do) i restock|running low|smart suggestions|what do i need|predict restock|sugerencias|recommandations|empfehlungen|सुझाव)/i.test(
       lower

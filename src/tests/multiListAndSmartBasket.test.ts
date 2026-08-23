@@ -25,7 +25,16 @@ describe('Multi-List Support & Voice Target Parsing', () => {
     expect(parsed.intent).toBe('ADD_ITEM');
     expect(parsed.targetList).toBe('home-essentials');
   });
+
+  it('correctly classifies checkout and order intents', () => {
+    const checkoutCmd = parseVoiceCommand('Proceed to checkout', 'en-US');
+    expect(checkoutCmd.intent).toBe('CHECKOUT');
+
+    const orderCmd = parseVoiceCommand('I want to order now', 'en-US');
+    expect(orderCmd.intent).toBe('CHECKOUT');
+  });
 });
+
 
 describe('Smart Basket "Build My List" Engine', () => {
   const mockHistory: ShoppingHistoryRecord[] = [
