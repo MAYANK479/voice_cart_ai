@@ -99,3 +99,59 @@ export function categorizeItem(itemName: string): CategoryId {
   return 'other';
 }
 
+/**
+ * Gets the emoji icon for a category.
+ */
+export function getCategoryEmoji(categoryId: CategoryId): string {
+  const emojis: Record<CategoryId, string> = {
+    produce: '🥑',
+    dairy: '🥛',
+    bakery: '🍞',
+    meat: '🥩',
+    pantry: '🥫',
+    beverages: '🧃',
+    snacks: '🍿',
+    household: '🧼',
+    other: '📦',
+  };
+  return emojis[categoryId] || '📦';
+}
+
+/**
+ * Gets the display name for a department.
+ */
+export function getDepartmentName(categoryId: CategoryId): string {
+  const names: Record<CategoryId, string> = {
+    produce: 'Produce & Fruits',
+    dairy: 'Dairy & Eggs',
+    bakery: 'Bakery & Bread',
+    meat: 'Meat & Seafood',
+    pantry: 'Pantry & Grains',
+    beverages: 'Beverages & Drinks',
+    snacks: 'Snacks & Sweets',
+    household: 'Household & Care',
+    other: 'Other Items',
+  };
+  return names[categoryId] || 'General';
+}
+
+/**
+ * Estimates a realistic grocery price for an item based on category averages.
+ */
+export function guessPrice(itemName: string): number {
+  const cat = categorizeItem(itemName);
+  const basePrices: Record<CategoryId, number> = {
+    produce: 2.99,
+    dairy: 4.49,
+    bakery: 3.89,
+    meat: 9.99,
+    pantry: 3.49,
+    beverages: 3.29,
+    snacks: 3.99,
+    household: 6.49,
+    other: 4.00,
+  };
+  return basePrices[cat] || 4.00;
+}
+
+

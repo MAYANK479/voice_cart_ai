@@ -129,8 +129,69 @@ Respond ONLY with a valid JSON object matching this schema:
   private static fallbackSemanticParser(transcript: string, language: SupportedLanguage): ParsedCommand {
     const text = transcript.toLowerCase().trim();
 
-    // Check for recipe or ingredient bundle context: e.g. "I want to bake a strawberry cake"
-    if (text.includes('cake') || text.includes('smoothie') || text.includes('pasta dinner') || text.includes('salad')) {
+    // 1. Budget queries: "How much money do I have left in my budget?"
+    if (text.includes('budget') || text.includes('how much money') || text.includes('spending left')) {
+      return {
+        rawTranscript: transcript,
+        normalizedTranscript: text,
+        intent: 'GET_SUGGESTIONS',
+        confidence: 0.88,
+        language,
+        items: [],
+        feedbackMessage: 'Checking your current grocery budget allocations.',
+      };
+    }
+
+    // 2. Removal queries: "Please remove the 2 bottles of whole milk from my cart"
+    if (text.startsWith('remove') || text.startsWith('please remove') || text.includes('delete') || text.includes('take off')) {
+      const cleaned = text.replace(/^(please\s+)?(remove|delete|take\s+off|drop)\s+/i, '').replace(/\s+(from|out\s+of)\s+my\s+(cart|list)/i, '');
+      const itemName = cleaned.replace(/^\d+\s+(bottles?|packs?|items?|lbs?|kg)?\s+(of\s+)?/i, '').trim();
+      return {
+        rawTranscript: transcript,
+        normalizedTranscript: text,
+        intent: 'REMOVE_ITEM',
+        confidence: 0.85,
+        language,
+        items: [{
+          name: itemName || 'item',
+          quantity: 1,
+          unit: 'item',
+          category: categorizeItem(itemName),
+          attributes: [],
+        }],
+        targetItemName: itemName,
+        feedbackMessage: `Removing ${itemName} from your list.`,
+        suggestedAction: 'REMOVE',
+      };
+    }
+
+    // 3. Search / Price constraints: "Show me organic coffee under $8"
+    if (text.includes('under $') || text.includes('less than $') || text.includes('show me') || text.includes('find')) {
+      const match = text.match(/\$?(\d+(\.\d+)?)/);
+      const price = match ? parseFloat(match[1]) : undefined;
+      const term = text.replace(/^(show\s+me|find|search\s+for|look\s+up)\s+/i, '').replace(/\s+(under|less\s+than|below)\s+\$?\d+(\.\d+)?/i, '').trim();
+
+      return {
+        rawTranscript: transcript,
+        normalizedTranscript: text,
+        intent: 'SEARCH_CATALOG',
+        confidence: 0.86,
+        language,
+        items: [{
+          name: term || 'product',
+          quantity: 1,
+          unit: 'item',
+          category: categorizeItem(term),
+          attributes: price ? [`max:$${price}`] : [],
+        }],
+        feedbackMessage: `Searching for ${term}${price ? ` under $${price}` : ''}.`,
+      };
+    }
+
+
+    // 4. Recipe or ingredient bundle context: e.g. "cook tacos", "strawberry cake", "creamy pasta"
+    if (text.includes('taco') || text.includes('cake') || text.includes('smoothie') || text.includes('pasta') || text.includes('salad') || text.includes('burger')) {
+      const isTaco = text.includes('taco');
       const isCake = text.includes('cake');
       const isPasta = text.includes('pasta');
 
@@ -139,7 +200,15 @@ Respond ONLY with a valid JSON object matching this schema:
         { name: 'Organic Whole Milk', quantity: 1, unit: 'bottle', category: 'dairy' },
       ];
 
-      if (isCake) {
+      if (isTaco) {
+        generatedItems = [
+          { name: 'Corn Tortillas', quantity: 1, unit: 'pack', category: 'bakery' },
+          { name: 'Ground Beef 85/15', quantity: 1, unit: 'lb', category: 'meat' },
+          { name: 'Mild Salsa Roja', quantity: 1, unit: 'jar', category: 'pantry' },
+          { name: 'Shredded Mexican Cheese', quantity: 1, unit: 'bag', category: 'dairy' },
+          { name: 'Hass Avocados', quantity: 2, unit: 'item', category: 'produce' },
+        ];
+      } else if (isCake) {
         generatedItems = [
           { name: 'All-Purpose Flour', quantity: 1, unit: 'bag', category: 'pantry' },
           { name: 'Pasture-Raised Eggs', quantity: 12, unit: 'item', category: 'dairy' },
@@ -153,15 +222,14 @@ Respond ONLY with a valid JSON object matching this schema:
         ];
       }
 
-
       return {
         rawTranscript: transcript,
         normalizedTranscript: text,
         intent: 'ADD_ITEM',
-        confidence: 0.91,
+        confidence: 0.92,
         language,
         items: generatedItems,
-        feedbackMessage: `AI detected recipe intent. Added ${generatedItems.map((i) => i.name).join(', ')} to your list.`,
+        feedbackMessage: `AI detected recipe bundle intent. Added ${generatedItems.map((i) => i.name).join(', ')} to your cart.`,
         suggestedAction: 'ADD',
       };
     }
@@ -178,3 +246,4 @@ Respond ONLY with a valid JSON object matching this schema:
     };
   }
 }
+

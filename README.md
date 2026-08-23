@@ -129,17 +129,29 @@ npm test
   - Brand and size parsing (*"Colgate"*, *"large"*)
   - Multilingual command extraction (Spanish, Hindi)
   - Deterministic confidence scoring
+- `src/tests/checkout.test.ts` (14 tests)
+  - Order subtotal calculations for selected/unselected items
+  - Promo code discounts (`VOICECART10`, `HARVEST15`, `FREESHIP`)
+  - Free delivery threshold verification (>$35) and express tier
+  - Estimated tax (8%) and grand total computations
+  - Item quantity increment/decrement bounds and receipt ID generation
 - `src/tests/multiListAndSmartBasket.test.ts` (7 tests)
   - Target list extraction (*"to party list"*, *"to office list"*)
   - Checkout voice intent routing
   - Smart basket generation from historical purchase frequency
-- `src/tests/recommendationEngine.test.ts` (4 tests)
-  - Depletion date prediction from consumption velocity
-  - Active list deduplication
-  - Dietary substitute matching
 - `src/tests/storageAndHistory.test.ts` (6 tests)
   - LocalStorage persistence and migration defaults
   - Undo deletion recovery
+- `src/tests/categorizer.test.ts` (6 tests)
+  - Department categorization (8 supermarket aisles)
+  - Price estimation bounds and category emoji mapping
+- `src/tests/llmFallback.test.ts` (5 tests)
+  - AI semantic fallback and multi-ingredient recipe bundle generation
+  - Natural phrasing removal, search, and budget resolution
+- `src/tests/recommendationEngine.test.ts` (4 tests)
+  - Depletion date prediction from consumption velocity
+  - Active list deduplication and dietary substitute matching
+
 
 ---
 
