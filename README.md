@@ -12,9 +12,9 @@
 
 ---
 
-## Executive Approach Write-Up (174 Words)
+## Project Overview & Technical Approach
 
-> **VoiceCart AI** is a client-side grocery shopping assistant built with **React 18, TypeScript, and Vite**. The platform pairs the browser's native **Web Speech API** with a high-throughput, deterministic rule-based intent and entity parser that extracts compound quantities (*"half a dozen"*), units, brands, dietary tags (*"organic"*), price bounds (*"under $5"*), and target lists with sub-millisecond execution. An optional AI/LLM semantic fallback handles complex conversational recipe requests.
+> **VoiceCart AI** is a client-side grocery shopping assistant built with **React 18, TypeScript, and Vite**. The platform pairs the browser's native **Web Speech API** with a high-throughput, deterministic rule-based intent and entity parser that extracts compound quantities (*"half a dozen"*), units, brands, dietary tags (*"organic"*), price bounds (*"under $5"*), and target lists with sub-millisecond execution. An optional semantic fallback handles complex conversational recipe requests.
 >
 > For grocery intelligence, VoiceCart AI provides:
 > 1. **Predictive Restock & Smart Basket**: Calculates consumption velocity from purchase history to forecast depletion dates and assemble a personalized smart basket in one click.
@@ -22,7 +22,7 @@
 > 3. **Smart Substitutes & Pairings**: Offers dietary, allergen, and budget alternatives alongside meal pairings.
 > 4. **End-to-End Grocery Checkout**: Full order review with delivery time slots, coupon verification, live tracking simulation, and printable receipts.
 >
-> The application runs entirely client-side without proprietary backend overhead, features zero-latency feedback, includes 57 automated tests, and adheres to a clean Apple × Linear consumer aesthetic.
+> The application runs entirely client-side without proprietary backend overhead, features zero-latency feedback, includes 57 automated tests, and adheres to a clean, warm design system.
 
 ---
 
@@ -36,7 +36,7 @@ graph TD
     B --> C[Dual-Engine Intent & Entity Parser]
     
     C -->|Fast-Path 0ms| C1[Deterministic Rule/Regex Parser]
-    C -->|Complex Phrasing / Recipe| C2[AI / LLM Semantic Fallback]
+    C -->|Complex Phrasing / Recipe| C2[Semantic Parser Fallback]
     
     C1 --> D{Intent Dispatcher}
     C2 --> D
@@ -51,7 +51,7 @@ graph TD
     G --> G3[Smart Dietary Substitutes Matrix]
     G --> G4[Companion Item Pairings Graph]
     
-    E --> H[Reactive UI Dashboard - SimiShop Aesthetic]
+    E --> H[Reactive UI Dashboard]
     F --> H
     G --> H
     N --> H
@@ -61,6 +61,7 @@ graph TD
     H --> K[NLP Engineering Lab & Inspector]
     H --> L[Spending Analytics & History Audit Logs]
 ```
+
 
 ### Architectural Tradeoff: Deterministic Parser vs External LLM
 - **Fast-Path Deterministic Parser**: Operates with **0ms network latency**, **$0 compute cost**, and deterministic repeatability for common grocery operations (*"Add 2 gallons of milk and 6 eggs"*).

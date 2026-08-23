@@ -12,13 +12,25 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# Archives & Bundles
+*.zip
+*.tar.gz
+voicecart_dist.zip
+voice_cart_ai.zip
+VoiceCart_AI_Redesigned.zip
+
+# Specs & Artifacts
+*.pdf
+
+# Environment & OS
+.DS_Store
+*.local
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
