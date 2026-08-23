@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { X, Search, Filter, Plus, Star, Tag } from 'lucide-react';
 import { useShopping } from '../../context/ShoppingContext';
 import { CategoryId } from '../../types/shopping';
@@ -22,6 +22,8 @@ export const CatalogModal: React.FC = () => {
     setCatalogModalOpen,
     catalogSearchQuery,
     setCatalogSearchQuery,
+    catalogCategoryFilter,
+    setCatalogCategoryFilter,
     catalogMaxPrice,
     setCatalogMaxPrice,
     addItem,
@@ -29,6 +31,13 @@ export const CatalogModal: React.FC = () => {
 
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | 'all'>('all');
   const [selectedDietaryTag, setSelectedDietaryTag] = useState<DietaryTag | 'all'>('all');
+
+  // Synchronize category filter from context
+  useEffect(() => {
+    if (catalogModalOpen && catalogCategoryFilter) {
+      setSelectedCategory(catalogCategoryFilter);
+    }
+  }, [catalogCategoryFilter, catalogModalOpen]);
 
   // Filter catalog products based on search, category, dietary, and price bounds
   const filteredProducts = useMemo(() => {
@@ -63,6 +72,7 @@ export const CatalogModal: React.FC = () => {
       return true;
     });
   }, [catalog, catalogSearchQuery, selectedCategory, selectedDietaryTag, catalogMaxPrice]);
+
 
   if (!catalogModalOpen) return null;
 
@@ -181,8 +191,10 @@ export const CatalogModal: React.FC = () => {
                   setCatalogSearchQuery('');
                   setCatalogMaxPrice(null);
                   setSelectedCategory('all');
+                  setCatalogCategoryFilter('all');
                   setSelectedDietaryTag('all');
                 }}
+
               >
                 Reset All Filters
               </button>

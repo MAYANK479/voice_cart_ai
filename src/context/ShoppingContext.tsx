@@ -117,8 +117,11 @@ interface ShoppingContextType {
   setCatalogModalOpen: (open: boolean) => void;
   catalogSearchQuery: string;
   setCatalogSearchQuery: (query: string) => void;
+  catalogCategoryFilter: CategoryId | 'all';
+  setCatalogCategoryFilter: (cat: CategoryId | 'all') => void;
   catalogMaxPrice: number | null;
   setCatalogMaxPrice: (price: number | null) => void;
+
 
   // Modals
   suggestionsModalOpen: boolean;
@@ -242,7 +245,9 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Modals & Navigation state
   const [catalogModalOpen, setCatalogModalOpen] = useState(false);
   const [catalogSearchQuery, setCatalogSearchQuery] = useState('');
+  const [catalogCategoryFilter, setCatalogCategoryFilter] = useState<CategoryId | 'all'>('all');
   const [catalogMaxPrice, setCatalogMaxPrice] = useState<number | null>(null);
+
 
   const [suggestionsModalOpen, setSuggestionsModalOpen] = useState(false);
   const [suggestionsInitialTab, setSuggestionsInitialTab] = useState<'restock' | 'seasonal' | 'substitutes'>('restock');
@@ -955,8 +960,11 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setCatalogModalOpen,
         catalogSearchQuery,
         setCatalogSearchQuery,
+        catalogCategoryFilter,
+        setCatalogCategoryFilter,
         catalogMaxPrice,
         setCatalogMaxPrice,
+
         suggestionsModalOpen,
         setSuggestionsModalOpen,
         suggestionsInitialTab,

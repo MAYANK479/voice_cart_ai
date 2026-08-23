@@ -310,11 +310,12 @@ export const storageService = {
   getTTSEnabled(): boolean {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.TTS_ENABLED);
-      return data === null ? true : data === 'true';
+      return data === 'true'; // Default to false (quiet UI)
     } catch {
-      return true;
+      return false;
     }
   },
+
 
   saveTTSEnabled(enabled: boolean): void {
     try {

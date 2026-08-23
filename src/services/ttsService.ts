@@ -1,8 +1,9 @@
 import { SupportedLanguage } from '../types/speech';
 
 export class TTSService {
-  private enabled: boolean = true;
+  private enabled: boolean = false; // Default to silent
   private voicePitch: number = 1.08; // Slightly elevated for a warm, friendly, pleasant tone
+
   private voiceRate: number = 1.0;   // Natural conversational cadence
   private currentLanguage: SupportedLanguage = 'en-US';
   private cachedVoices: SpeechSynthesisVoice[] = [];

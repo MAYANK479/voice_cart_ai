@@ -22,12 +22,14 @@ const GROCERY_CATEGORIES: CategoryPill[] = [
 ];
 
 export const CategoriesCarousel: React.FC = () => {
-  const { setCatalogModalOpen, setCatalogSearchQuery } = useShopping();
+  const { setCatalogModalOpen, setCatalogSearchQuery, setCatalogCategoryFilter } = useShopping();
 
   const handleCategoryClick = (cat: CategoryPill) => {
-    setCatalogSearchQuery(cat.name.split(' ')[0]);
+    setCatalogCategoryFilter(cat.id);
+    setCatalogSearchQuery('');
     setCatalogModalOpen(true);
   };
+
 
 
   return (
