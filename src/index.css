@@ -2503,6 +2503,403 @@ button, input, select, textarea {
   max-height: 480px;
 }
 
+/* =========================================================================
+   SimiShop & Mobile Grocery App Component Styles
+   ========================================================================= */
+
+/* Categories Horizontal Section */
+.simi-categories-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-glass);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.simi-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.simi-section-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.simi-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.btn-simi-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #059669;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+[data-theme="dark"] .btn-simi-filter {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: #34D399;
+}
+
+.btn-simi-filter:hover {
+  background: #DCFCE7;
+  transform: translateY(-1px);
+}
+
+.simi-scroll-arrows {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.btn-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-arrow:hover {
+  background: var(--accent-mint);
+  color: #FFFFFF;
+  border-color: var(--accent-mint);
+}
+
+.simi-categories-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.simi-category-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-glass);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 86px;
+  text-align: center;
+}
+
+.simi-category-card:hover {
+  transform: translateY(-3px);
+  border-color: #10B981;
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.simi-category-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.simi-category-emoji {
+  font-size: 1.6rem;
+}
+
+.simi-category-name {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Popular Products Section */
+.simi-popular-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.simi-view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  color: #059669;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .simi-view-all {
+  color: #34D399;
+}
+
+.simi-view-all:hover {
+  text-decoration: underline;
+}
+
+.simi-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 1rem;
+}
+
+.simi-product-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-glass);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.simi-product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: #10B981;
+}
+
+.simi-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 24px;
+}
+
+.simi-discount-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #059669;
+  background: #DCFCE7;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+}
+
+[data-theme="dark"] .simi-discount-tag {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34D399;
+}
+
+.simi-heart-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.simi-heart-btn:hover {
+  transform: scale(1.1);
+}
+
+.simi-product-thumb {
+  width: 100%;
+  height: 105px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.simi-thumb-emoji {
+  font-size: 2.8rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.simi-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.simi-product-name {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.simi-product-sub {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.simi-product-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.4rem;
+}
+
+.simi-product-price .price-num {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #059669;
+}
+
+[data-theme="dark"] .simi-product-price .price-num {
+  color: #34D399;
+}
+
+.simi-product-price .price-unit {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.simi-btn-add {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #059669;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
+}
+
+.simi-btn-add:hover {
+  background: #047857;
+  transform: scale(1.1);
+}
+
+/* Discount Shop Promo Grid */
+.simi-discount-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.simi-discount-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.simi-discount-card {
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.85rem;
+  min-height: 145px;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.simi-discount-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.simi-discount-badge {
+  font-size: 0.78rem;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px);
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-full);
+  align-self: flex-start;
+  letter-spacing: 0.02em;
+}
+
+.simi-discount-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.simi-discount-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.simi-discount-sub {
+  font-size: 0.76rem;
+  opacity: 0.92;
+  line-height: 1.3;
+}
+
+.btn-shop-now {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  background: #FFFFFF;
+  color: #059669;
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-shop-now:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+/* Responsive Grid Tweaks */
+@media (max-width: 768px) {
+  .simi-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .simi-discount-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Toast Container */
 .toast-container {
   position: fixed;
@@ -2598,3 +2995,4 @@ button, input, select, textarea {
     transition-duration: 0.01ms !important;
   }
 }
+

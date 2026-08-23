@@ -14,6 +14,10 @@ import { InsightsView } from './components/Insights/InsightsView';
 import { HistoryView } from './components/History/HistoryView';
 import { NlpPlaygroundView } from './components/NlpLab/NlpPlaygroundView';
 
+import { CategoriesCarousel } from './components/Grocery/CategoriesCarousel';
+import { PopularProductsGrid } from './components/Grocery/PopularProductsGrid';
+import { DiscountBanners } from './components/Grocery/DiscountBanners';
+
 const AppContent: React.FC = () => {
   const { activeView } = useShopping();
 
@@ -28,9 +32,18 @@ const AppContent: React.FC = () => {
           {/* Voice Assistant Visualizer Hero */}
           <VoiceAssistantHero />
 
+          {/* Grocery Categories Horizontal Carousel */}
+          <CategoriesCarousel />
+
+          {/* Popular Products Carousel & Fast Add Grid */}
+          <PopularProductsGrid />
+
+          {/* Discount & Promo Deals */}
+          <DiscountBanners />
+
           {/* Main Workspace Dashboard Grid */}
           <main className="dashboard-grid">
-            {/* Main Column: Auto-Categorized Shopping List */}
+            {/* Main Column: Auto-Categorized Shopping List with Multi-Lists */}
             <ShoppingListView />
 
             {/* Right Column: Smart Intelligence & Budget Sidebar */}
@@ -41,6 +54,7 @@ const AppContent: React.FC = () => {
           </main>
         </>
       )}
+
 
       {activeView === 'insights' && <InsightsView />}
 
