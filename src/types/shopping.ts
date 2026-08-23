@@ -20,6 +20,13 @@ export interface CategoryInfo {
   bgColor: string;
 }
 
+export interface ShoppingListInfo {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+}
+
 export interface ShoppingItem {
   id: string;
   name: string;
@@ -34,6 +41,31 @@ export interface ShoppingItem {
   addedAt: string; // ISO date string
   updatedAt?: string;
   source: 'voice' | 'manual' | 'suggestion' | 'substitute' | 'catalog';
+  listId?: string; // target list ID e.g. 'weekly-grocery'
+  isRecurring?: boolean;
+  recurringDays?: number; // e.g. 7 for every 7 days
+}
+
+export interface SmartBasketSuggestion {
+  habitItems: Array<{
+    name: string;
+    quantity: number;
+    unit: string;
+    category: CategoryId;
+    price: number;
+    reason: string;
+    selected: boolean;
+  }>;
+  recommendedItems: Array<{
+    name: string;
+    quantity: number;
+    unit: string;
+    category: CategoryId;
+    price: number;
+    reason: string;
+    selected: boolean;
+  }>;
+  totalEstimatedCost: number;
 }
 
 export interface RestockPrediction {
@@ -46,6 +78,7 @@ export interface RestockPrediction {
   estimatedPrice: number;
   unit: string;
   reason: string;
+  isRecurring?: boolean;
 }
 
 export interface SeasonalProduct {
@@ -89,3 +122,4 @@ export interface ShoppingHistoryRecord {
   purchaseDate: string;
   frequency: number; // times purchased in past 60 days
 }
+

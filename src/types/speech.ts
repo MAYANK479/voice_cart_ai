@@ -36,6 +36,7 @@ export interface ParsedItemEntity {
   attributes?: string[];
   maxPrice?: number;
   minPrice?: number;
+  targetList?: string;
 }
 
 export interface ParsedCommand {
@@ -45,6 +46,7 @@ export interface ParsedCommand {
   confidence: number;
   language: SupportedLanguage;
   items: ParsedItemEntity[];
+  targetList?: string;
   filterCriteria?: {
     query?: string;
     brand?: string;
@@ -58,6 +60,7 @@ export interface ParsedCommand {
   feedbackMessage: string;
   suggestedAction?: 'ADD' | 'REMOVE' | 'MODIFY' | 'SEARCH' | 'SUBSTITUTE' | 'SEASONAL' | 'RESTOCK';
 }
+
 
 export interface SpeechRecognitionResultState {
   transcript: string;

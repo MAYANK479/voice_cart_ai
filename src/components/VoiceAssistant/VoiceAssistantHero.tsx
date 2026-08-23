@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Sparkles, X, Plus, Mic, MicOff, Send, Loader2 } from 'lucide-react';
+import { Sparkles, Mic, MicOff, Send, Loader2 } from 'lucide-react';
 import { useShopping } from '../../context/ShoppingContext';
 import { NlpInterpretationCard } from './NlpInterpretationCard';
 
@@ -11,10 +11,8 @@ export const VoiceAssistantHero: React.FC = () => {
     startVoiceListening,
     stopVoiceListening,
     processTextInputCommand,
-    activePairing,
-    dismissPairing,
-    acceptPairing,
   } = useShopping();
+
 
   const [inputVal, setInputVal] = useState('');
 
@@ -42,36 +40,36 @@ export const VoiceAssistantHero: React.FC = () => {
   };
 
   const demoChips = [
-    { label: '2 Bottles Organic Milk', cmd: 'Add 2 bottles of organic milk', icon: '🥛' },
-    { label: '5 Apples', cmd: 'Add 5 apples', icon: '🍎' },
-    { label: 'Remove Milk', cmd: 'Remove milk', icon: '🗑️' },
-    { label: 'Toothpaste < $5', cmd: 'Find toothpaste under $5', icon: '🔍' },
-    { label: 'Restock Staples', cmd: 'What should I restock?', icon: '📦' },
-    { label: 'Butter Substitute', cmd: 'Suggest a substitute for butter', icon: '🧈' },
-    { label: 'Seasonal Deals', cmd: 'What is in season today?', icon: '🌱' },
+    { label: 'Add 2 bottles organic milk', cmd: 'Add 2 bottles of organic milk', icon: '🥛' },
+    { label: 'Buy 5 apples', cmd: 'Buy 5 apples', icon: '🍎' },
+    { label: 'Remove bread', cmd: 'Remove bread', icon: '🗑️' },
+    { label: 'What should I restock?', cmd: 'What should I restock?', icon: '📦' },
+    { label: 'Find toothpaste < $5', cmd: 'Find toothpaste under $5', icon: '🔍' },
+    { label: 'Substitute for butter', cmd: 'Suggest a substitute for butter', icon: '🧈' },
   ];
 
   return (
-    <section className="glass-panel hero-command-deck" aria-label="AI Voice Command Deck">
-      {/* Top Banner: Greeting & Live Orb Capsule */}
+    <section className="glass-panel hero-command-deck" aria-label="AI Voice Command Center">
+      {/* Top Banner: Greeting & Voice Assistant Orb */}
       <div className="deck-top-row">
         <div className="deck-title-area">
           <div className="deck-greeting-badge">
             <span className="deck-glow-dot" />
-            <span>{greeting}</span>
+            <span>{greeting}, Mayank 👋</span>
             <span className="deck-divider">•</span>
-            <span className="deck-tagline">AI Voice Assistant</span>
+            <span className="deck-tagline">Your shopping, just one conversation away.</span>
           </div>
-          <h2 className="deck-headline">What would you like to add today?</h2>
+          <h2 className="deck-headline">What would you like to buy?</h2>
+          <p className="deck-subtext">Speak naturally in English, Hindi, Spanish, French, or German. I'll organize the rest.</p>
         </div>
 
-        {/* Live Audio Capsule Button */}
+        {/* Central Voice Assistant Orb Button */}
         <button
           type="button"
-          className={`deck-orb-pill ${isListening ? 'listening' : speechStatus === 'processing' ? 'processing' : ''}`}
+          className={`deck-orb-pill ${isListening ? 'listening' : speechStatus === 'processing' ? 'processing' : speechStatus === 'error' ? 'error' : ''}`}
           onClick={handleToggleListening}
           title={isListening ? 'Click to stop listening' : 'Click to start voice command'}
-          aria-label={isListening ? 'Stop listening' : 'Start voice command'}
+          aria-label={isListening ? 'Stop voice command' : 'Start voice command'}
         >
           <div className="orb-pill-icon">
             {isListening ? (
@@ -88,7 +86,13 @@ export const VoiceAssistantHero: React.FC = () => {
             )}
           </div>
           <span className="orb-pill-label">
-            {isListening ? 'Listening...' : speechStatus === 'processing' ? 'Analyzing...' : 'Tap to Speak'}
+            {isListening
+              ? 'Listening...'
+              : speechStatus === 'processing'
+              ? 'Understanding...'
+              : speechStatus === 'error'
+              ? 'Try again'
+              : '● Tap to speak'}
           </span>
         </button>
       </div>
@@ -100,7 +104,7 @@ export const VoiceAssistantHero: React.FC = () => {
           className={`deck-mic-btn ${isListening ? 'active' : ''}`}
           onClick={handleToggleListening}
           title={isListening ? 'Stop microphone' : 'Start microphone voice input'}
-          aria-label={isListening ? 'Stop microphone' : 'Start microphone'}
+          aria-label="Start voice command"
         >
           {isListening ? <MicOff size={18} /> : <Mic size={18} />}
         </button>
@@ -108,7 +112,7 @@ export const VoiceAssistantHero: React.FC = () => {
         <input
           type="text"
           className="deck-input-field"
-          placeholder="Speak or type: 'Add 2 bottles of milk', 'Find snacks under $5', 'What should I restock?'..."
+          placeholder="Speak or type: 'Add 2 bottles of organic milk', 'Find toothpaste under $5', 'What should I restock?'..."
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
         />
@@ -124,7 +128,7 @@ export const VoiceAssistantHero: React.FC = () => {
         <div className="deck-transcript-bar">
           <span className="transcript-pulse-dot" />
           <span className="transcript-live-text">
-            {interimTranscript || 'Listening to your voice... Speak now.'}
+            <strong>YOU SAID:</strong> "{interimTranscript || 'Listening to your voice... Speak now.'}"
           </span>
         </div>
       )}
@@ -132,10 +136,10 @@ export const VoiceAssistantHero: React.FC = () => {
       {/* Structured NLP Output Card */}
       <NlpInterpretationCard />
 
-      {/* Quick Demo Chips Strip */}
+      {/* Quick Demo Prompts */}
       <div className="deck-chips-scroll">
         <span className="deck-chips-label">
-          <Sparkles size={13} color="#fbbf24" /> Quick Prompts:
+          <Sparkles size={13} color="var(--accent-primary)" /> Try saying:
         </span>
         <div className="deck-chips-group">
           {demoChips.map((chip, idx) => (
@@ -144,7 +148,7 @@ export const VoiceAssistantHero: React.FC = () => {
               type="button"
               className="deck-chip-btn"
               onClick={() => processTextInputCommand(chip.cmd, 'demo')}
-              title={`Run: "${chip.cmd}"`}
+              title={`Run command: "${chip.cmd}"`}
             >
               <span className="chip-icon">{chip.icon}</span>
               <span>{chip.label}</span>
@@ -152,44 +156,6 @@ export const VoiceAssistantHero: React.FC = () => {
           ))}
         </div>
       </div>
-
-      {/* Dynamic Companion Item Pairing Suggestion Banner */}
-      {activePairing && (
-        <div className="pairing-banner" role="alert">
-          <div className="pairing-info">
-            <div className="pairing-icon-box">
-              <Sparkles size={18} />
-            </div>
-            <div>
-              <div className="pairing-title">
-                Smart Companion Pairing: <strong>{activePairing.suggestedItem}</strong> (${activePairing.price.toFixed(2)})
-              </div>
-              <div className="pairing-desc">{activePairing.reason}</div>
-            </div>
-          </div>
-
-          <div className="pairing-actions">
-            <button
-              className="btn-accept-pair"
-              onClick={() => acceptPairing(activePairing)}
-            >
-              <Plus size={14} style={{ display: 'inline', marginRight: '4px' }} />
-              Add to List
-            </button>
-            <button
-              className="btn-icon"
-              style={{ width: '30px', height: '30px' }}
-              onClick={dismissPairing}
-              title="Dismiss suggestion"
-              aria-label="Dismiss companion recommendation"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        </div>
-      )}
     </section>
   );
 };
-
-

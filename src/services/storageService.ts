@@ -1,9 +1,11 @@
-import { ShoppingItem, ShoppingHistoryRecord } from '../types/shopping';
+import { ShoppingItem, ShoppingHistoryRecord, ShoppingListInfo } from '../types/shopping';
 import { INITIAL_SHOPPING_HISTORY } from '../data/historyData';
 import { SupportedLanguage, CommandLogEntry } from '../types/speech';
 
 const STORAGE_KEYS = {
   ITEMS: 'voicecart_shopping_items_v1',
+  LISTS: 'voicecart_shopping_lists_v1',
+  ACTIVE_LIST: 'voicecart_active_list_id_v1',
   HISTORY: 'voicecart_shopping_history_v1',
   COMMANDS: 'voicecart_command_history_v1',
   BUDGET: 'voicecart_budget_limit_v1',
@@ -11,6 +13,101 @@ const STORAGE_KEYS = {
   TTS_ENABLED: 'voicecart_tts_enabled_v1',
   THEME: 'voicecart_theme_v1',
 };
+
+export const INITIAL_SHOPPING_LISTS: ShoppingListInfo[] = [
+  { id: 'weekly-grocery', name: 'Weekly Grocery', emoji: '🛒', description: 'Fresh produce, dairy & family staples' },
+  { id: 'home-essentials', name: 'Home Essentials', emoji: '🏠', description: 'Cleaning, pantry & household goods' },
+  { id: 'party', name: 'Party & Gatherings', emoji: '🎉', description: 'Snacks, beverages, dips & cups' },
+  { id: 'office', name: 'Office Pantry', emoji: '💼', description: 'Coffee, tea & afternoon snacks' },
+];
+
+export const INITIAL_DEMO_ITEMS: ShoppingItem[] = [
+  {
+    id: 'item-demo-1',
+    name: 'Organic Honeycrisp Apples',
+    quantity: 3,
+    unit: 'lb',
+    category: 'produce',
+    estimatedPrice: 3.99,
+    completed: false,
+    dietaryTags: ['Organic', 'Vegan'],
+    addedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    source: 'voice',
+    listId: 'weekly-grocery',
+    isRecurring: true,
+    recurringDays: 7,
+  },
+  {
+    id: 'item-demo-2',
+    name: 'Pasture-Raised Grade A Large Eggs',
+    quantity: 1,
+    unit: 'carton',
+    category: 'dairy',
+    estimatedPrice: 4.99,
+    completed: false,
+    dietaryTags: ['Organic', 'Keto'],
+    addedAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+    source: 'voice',
+    listId: 'weekly-grocery',
+    isRecurring: true,
+    recurringDays: 7,
+  },
+  {
+    id: 'item-demo-3',
+    name: 'Artisan Sourdough Loaf',
+    quantity: 1,
+    unit: 'loaf',
+    category: 'bakery',
+    estimatedPrice: 4.29,
+    completed: true,
+    dietaryTags: ['Vegan'],
+    addedAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
+    source: 'manual',
+    listId: 'weekly-grocery',
+    isRecurring: true,
+    recurringDays: 5,
+  },
+  {
+    id: 'item-demo-4',
+    name: 'Cold Brew Coffee Concentrate',
+    quantity: 2,
+    unit: 'bottle',
+    category: 'beverages',
+    estimatedPrice: 6.49,
+    completed: false,
+    dietaryTags: ['Organic', 'Sugar-Free'],
+    addedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    source: 'voice',
+    listId: 'weekly-grocery',
+  },
+  {
+    id: 'item-demo-5',
+    name: 'Organic Sea Salt Tortilla Chips',
+    quantity: 1,
+    unit: 'bag',
+    category: 'snacks',
+    estimatedPrice: 3.49,
+    completed: false,
+    dietaryTags: ['Organic', 'Gluten-Free'],
+    addedAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    source: 'suggestion',
+    listId: 'party',
+  },
+  {
+    id: 'item-demo-6',
+    name: 'Eco Dish Soap Refill',
+    quantity: 1,
+    unit: 'bottle',
+    category: 'household',
+    estimatedPrice: 4.79,
+    completed: false,
+    dietaryTags: ['Organic'],
+    addedAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+    source: 'manual',
+    listId: 'home-essentials',
+  },
+];
+
 
 export const INITIAL_DEMO_COMMANDS: CommandLogEntry[] = [
   {
@@ -72,70 +169,6 @@ export const INITIAL_DEMO_COMMANDS: CommandLogEntry[] = [
   },
 ];
 
-
-export const INITIAL_DEMO_ITEMS: ShoppingItem[] = [
-  {
-    id: 'item-demo-1',
-    name: 'Organic Honeycrisp Apples',
-    quantity: 3,
-    unit: 'lb',
-    category: 'produce',
-    estimatedPrice: 3.99,
-    completed: false,
-    dietaryTags: ['Organic', 'Vegan'],
-    addedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    source: 'voice',
-  },
-  {
-    id: 'item-demo-2',
-    name: 'Pasture-Raised Grade A Large Eggs',
-    quantity: 1,
-    unit: 'carton',
-    category: 'dairy',
-    estimatedPrice: 4.99,
-    completed: false,
-    dietaryTags: ['Organic', 'Keto'],
-    addedAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-    source: 'voice',
-  },
-  {
-    id: 'item-demo-3',
-    name: 'Artisan Sourdough Loaf',
-    quantity: 1,
-    unit: 'loaf',
-    category: 'bakery',
-    estimatedPrice: 4.29,
-    completed: true,
-    dietaryTags: ['Vegan'],
-    addedAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
-    source: 'manual',
-  },
-  {
-    id: 'item-demo-4',
-    name: 'Cold Brew Coffee Concentrate',
-    quantity: 2,
-    unit: 'bottle',
-    category: 'beverages',
-    estimatedPrice: 6.49,
-    completed: false,
-    dietaryTags: ['Organic', 'Sugar-Free'],
-    addedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-    source: 'voice',
-  },
-  {
-    id: 'item-demo-5',
-    name: 'Organic Sea Salt Tortilla Chips',
-    quantity: 1,
-    unit: 'bag',
-    category: 'snacks',
-    estimatedPrice: 3.49,
-    completed: false,
-    dietaryTags: ['Organic', 'Gluten-Free'],
-    addedAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
-    source: 'suggestion',
-  },
-];
-
 export const storageService = {
   getItems(): ShoppingItem[] {
     try {
@@ -157,6 +190,45 @@ export const storageService = {
       console.warn('Error saving items to localStorage', e);
     }
   },
+
+  getLists(): ShoppingListInfo[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.LISTS);
+      if (!data) {
+        localStorage.setItem(STORAGE_KEYS.LISTS, JSON.stringify(INITIAL_SHOPPING_LISTS));
+        return INITIAL_SHOPPING_LISTS;
+      }
+      return JSON.parse(data);
+    } catch {
+      return INITIAL_SHOPPING_LISTS;
+    }
+  },
+
+  saveLists(lists: ShoppingListInfo[]): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.LISTS, JSON.stringify(lists));
+    } catch (e) {
+      console.warn('Error saving lists to localStorage', e);
+    }
+  },
+
+  getActiveListId(): string {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.ACTIVE_LIST);
+      return data || 'weekly-grocery';
+    } catch {
+      return 'weekly-grocery';
+    }
+  },
+
+  saveActiveListId(id: string): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_LIST, id);
+    } catch (e) {
+      console.warn('Error saving active list ID', e);
+    }
+  },
+
 
   getHistory(): ShoppingHistoryRecord[] {
     try {

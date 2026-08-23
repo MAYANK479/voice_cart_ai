@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import confetti from 'canvas-confetti';
 import {
   ShoppingItem,
@@ -9,6 +9,8 @@ import {
   PairingSuggestion,
   ShoppingHistoryRecord,
   ActiveView,
+  ShoppingListInfo,
+  SmartBasketSuggestion,
 } from '../types/shopping';
 import {
   SpeechStatus,
@@ -26,7 +28,9 @@ import {
   getSeasonalRecommendations,
   getSubstitutesFor,
   findCompanionPairing,
+  generateSmartBasket,
 } from '../services/recommendationEngine';
+
 import { storageService, INITIAL_DEMO_ITEMS, INITIAL_DEMO_COMMANDS } from '../services/storageService';
 import { CATALOG_PRODUCTS } from '../data/catalogData';
 
@@ -45,6 +49,20 @@ interface ShoppingContextType {
   activeView: ActiveView;
   setActiveView: (view: ActiveView) => void;
 
+  // Shopping Lists
+  lists: ShoppingListInfo[];
+  activeListId: string;
+  setActiveListId: (id: string) => void;
+  activeListName: string;
+  activeListItems: ShoppingItem[];
+  toggleItemRecurring: (id: string, days?: number) => void;
+
+  // Smart Basket / Build My List
+  buildMyListBasket: SmartBasketSuggestion;
+  addSmartBasketItems: (items: Array<{ name: string; quantity: number; unit: string; category: CategoryId; price: number }>) => void;
+  buildMyListModalOpen: boolean;
+  setBuildMyListModalOpen: (open: boolean) => void;
+
   // Shopping list state
   items: ShoppingItem[];
   addItem: (item: Partial<ShoppingItem>, announce?: boolean) => void;
@@ -56,6 +74,7 @@ interface ShoppingContextType {
   resetToDemo: () => void;
   undoDelete: () => void;
   lastDeletedItem: ShoppingItem | null;
+
 
   // Theme
   theme: 'dark' | 'light';
@@ -133,6 +152,11 @@ const ShoppingContext = createContext<ShoppingContextType | undefined>(undefined
 export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeView, setActiveView] = useState<ActiveView>('dashboard');
   const [items, setItems] = useState<ShoppingItem[]>(() => storageService.getItems());
+  const [lists] = useState<ShoppingListInfo[]>(() => storageService.getLists());
+  const [activeListId, setActiveListIdState] = useState<string>(() => storageService.getActiveListId());
+
+  const [buildMyListModalOpen, setBuildMyListModalOpen] = useState<boolean>(false);
+
   const [history] = useState<ShoppingHistoryRecord[]>(() => storageService.getHistory());
   const [commandLogs, setCommandLogs] = useState<CommandLogEntry[]>(() => storageService.getCommands());
   const [budget, setBudgetState] = useState<number>(() => storageService.getBudget());
@@ -141,6 +165,36 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [theme, setThemeState] = useState<'dark' | 'light'>(() => storageService.getTheme());
   const [currentLanguage, setCurrentLanguageState] = useState<SupportedLanguage>(() => storageService.getLanguage());
   const [ttsEnabled, setTtsEnabledState] = useState<boolean>(() => storageService.getTTSEnabled());
+
+  const setActiveListId = useCallback((id: string) => {
+    setActiveListIdState(id);
+    storageService.saveActiveListId(id);
+  }, []);
+
+  const activeListName = useMemo(() => lists.find((l) => l.id === activeListId)?.name || 'Shopping List', [lists, activeListId]);
+  const activeListItems = useMemo(() => items.filter((i) => (i.listId || 'weekly-grocery') === activeListId), [items, activeListId]);
+
+  const toggleItemRecurring = useCallback((id: string, days = 7) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const isNowRecurring = !item.isRecurring;
+          return {
+            ...item,
+            isRecurring: isNowRecurring,
+            recurringDays: isNowRecurring ? (item.recurringDays || days) : undefined,
+          };
+        }
+        return item;
+      })
+    );
+  }, []);
+
+  const buildMyListBasket = useMemo(
+    () => generateSmartBasket(history, activeListItems, items.filter((i) => i.isRecurring)),
+    [history, activeListItems, items]
+  );
+
 
   const setTheme = useCallback((newTheme: 'dark' | 'light') => {
     setThemeState(newTheme);
@@ -295,7 +349,10 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (!item.name || !item.name.trim()) return;
 
       const cleanName = item.name.trim();
-      const existingIndex = items.findIndex((i) => i.name.toLowerCase() === cleanName.toLowerCase());
+      const targetListId = item.listId || activeListId;
+      const existingIndex = items.findIndex(
+        (i) => i.name.toLowerCase() === cleanName.toLowerCase() && (i.listId || 'weekly-grocery') === targetListId
+      );
 
       let updatedList = [...items];
       const category = item.category || 'produce';
@@ -325,6 +382,9 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           brand: item.brand,
           addedAt: new Date().toISOString(),
           source: item.source || 'manual',
+          listId: targetListId,
+          isRecurring: item.isRecurring || false,
+          recurringDays: item.recurringDays,
         };
         updatedList = [newItem, ...updatedList];
       }
@@ -332,7 +392,8 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setItems(updatedList);
 
       if (announce) {
-        const msg = `Added ${quantity} ${unit !== 'item' ? unit + ' of ' : ''}${cleanName}`;
+        const listLabel = targetListId !== 'weekly-grocery' ? ` to ${lists.find((l) => l.id === targetListId)?.name || 'list'}` : '';
+        const msg = `Added ${quantity} ${unit !== 'item' ? unit + ' of ' : ''}${cleanName}${listLabel}`;
         addToast({
           type: 'success',
           title: 'Item Added',
@@ -347,8 +408,55 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setActivePairing(companion);
       }
     },
-    [items, addToast]
+    [items, activeListId, lists, addToast]
   );
+
+  const addSmartBasketItems = useCallback(
+    (basketItems: Array<{ name: string; quantity: number; unit: string; category: CategoryId; price: number }>) => {
+      if (!basketItems || basketItems.length === 0) return;
+
+      let updatedList = [...items];
+      basketItems.forEach((b) => {
+        const cleanName = b.name.trim();
+        const existingIndex = updatedList.findIndex(
+          (i) => i.name.toLowerCase() === cleanName.toLowerCase() && (i.listId || 'weekly-grocery') === activeListId
+        );
+
+        if (existingIndex >= 0) {
+          updatedList[existingIndex] = {
+            ...updatedList[existingIndex],
+            quantity: updatedList[existingIndex].quantity + b.quantity,
+            completed: false,
+          };
+        } else {
+          updatedList.push({
+            id: `item-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+            name: cleanName,
+            quantity: b.quantity,
+            unit: b.unit,
+            category: b.category,
+            estimatedPrice: b.price,
+            completed: false,
+            addedAt: new Date().toISOString(),
+            source: 'suggestion',
+            listId: activeListId,
+          });
+        }
+      });
+
+      setItems(updatedList);
+      setBuildMyListModalOpen(false);
+
+      addToast({
+        type: 'success',
+        title: 'Smart Basket Assembled',
+        message: `Added ${basketItems.length} personalized items to ${activeListName}.`,
+      });
+      ttsService.speak(`Added ${basketItems.length} items to your shopping list.`);
+    },
+    [items, activeListId, activeListName, addToast]
+  );
+
 
   const removeItem = useCallback(
     (idOrName: string) => {
@@ -776,6 +884,16 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       value={{
         activeView,
         setActiveView,
+        lists,
+        activeListId,
+        setActiveListId,
+        activeListName,
+        activeListItems,
+        toggleItemRecurring,
+        buildMyListBasket,
+        addSmartBasketItems,
+        buildMyListModalOpen,
+        setBuildMyListModalOpen,
         items,
         addItem,
         removeItem,
@@ -790,7 +908,6 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setTheme,
         toggleTheme,
         speechStatus,
-
         isListening,
         interimTranscript,
         lastTranscript,
@@ -843,6 +960,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     </ShoppingContext.Provider>
   );
 };
+
 
 
 export const useShopping = (): ShoppingContextType => {

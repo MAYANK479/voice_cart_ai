@@ -1,14 +1,14 @@
 <div align="center">
 
 # 🛒 VoiceCart AI
-### Intelligent Voice-Powered Shopping Assistant & Recommendation Engine
+### Intelligent Voice-Powered Grocery Assistant & Recommendation Engine
 
 [![CI](https://github.com/MAYANK479/voice_cart_ai/actions/workflows/ci.yml/badge.svg)](https://github.com/MAYANK479/voice_cart_ai/actions/workflows/ci.yml)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Netlify-00C7B7?style=flat&logo=netlify&logoColor=white)](https://voicecommandai.netlify.app)
 [![React 18](https://img.shields.io/badge/React-18.3-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Vitest](https://img.shields.io/badge/Tests-25%20Passing-10B981?style=flat&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-56%20Passing-10B981?style=flat&logo=vitest&logoColor=white)](https://vitest.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **[🌐 Experience the Live Application](https://voicecommandai.netlify.app)** • **[📖 Architecture](#-system-architecture)** • **[🧪 Run Unit Tests](#-testing--quality-assurance)** • **[🎙️ Voice Commands](#-supported-voice-commands)**
@@ -23,14 +23,16 @@
 
 ## 📌 Executive Approach Write-Up (200 Words)
 
-> **VoiceCart AI** is an intelligent, voice-first shopping list manager and recommendation engine built with **React 18, TypeScript, and Vite**. The system integrates the native **Web Speech API** (`webkitSpeechRecognition` & `SpeechSynthesis`) with a custom deterministic Natural Language Processing (NLP) pipeline that extracts user intents, fractional/word quantities (*"half a dozen"*), grocery units (*"cartons"*, *"liters"*), product attributes (*"organic"*, *"gluten-free"*), and price bounds (*"under $5"*), while supporting multi-item chaining (*"Add 2 apples and 1 carton of milk"*).
+> **VoiceCart AI** is an intelligent, voice-first grocery assistant designed with an **Apple × Linear premium consumer aesthetic** built with **React 18, TypeScript, and Vite**. The system integrates the native **Web Speech API** (`webkitSpeechRecognition` & `SpeechSynthesis`) with a custom deterministic Natural Language Processing (NLP) pipeline that extracts user intents, fractional/word quantities (*"half a dozen"*), grocery units (*"cartons"*, *"liters"*), product attributes (*"organic"*, *"gluten-free"*), target shopping lists (*"to party list"*), and price bounds (*"under $5"*), while supporting multi-item chaining (*"Add 2 apples and 1 carton of milk"*).
 >
-> For intelligence, the platform features a multi-tiered suggestion engine:
-> 1. **Predictive Restock Engine**: Analyzes shopping history and consumption cycles (velocity) to alert users when staples run low.
-> 2. **Dynamic Seasonal & Deals Engine**: Recommends peak-harvest produce and discounted items.
-> 3. **Smart Substitutes & Companion Engine**: Identifies dietary, allergy, and budget alternatives alongside meal pairings (e.g., chips $\rightarrow$ salsa).
+> For product intelligence, the platform features:
+> 1. **✨ "Build My List" Engine**: Analyzes 60-day consumption velocity and staple patterns to generate a personalized smart basket with 1-click addition.
+> 2. **Predictive Restock & Recurring Staples**: Tracks cadence (e.g. milk every 7 days) and alerts users right when items are due.
+> 3. **Multiple Shopping Lists**: Seamless switching between `Weekly Grocery`, `Home Essentials`, `Party`, and `Office`.
+> 4. **Smart Substitutes & Companion Engine**: Identifies dietary, allergy, and budget alternatives alongside meal pairings (e.g., chips $\rightarrow$ salsa).
 >
 > Built with modular separation of concerns, the app auto-categorizes items into 8 departments, offers multilingual support (English, Spanish, French, German, Hindi), tracks budgets with live progress visuals, provides accessible TTS voice confirmations, and runs 100% offline with zero external paid dependencies.
+
 
 ---
 

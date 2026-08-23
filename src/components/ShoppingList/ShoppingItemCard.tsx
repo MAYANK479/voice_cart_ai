@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, Plus, Minus, Trash2 } from 'lucide-react';
+import { Check, Plus, Minus, Trash2, Repeat } from 'lucide-react';
 import { ShoppingItem } from '../../types/shopping';
 import { useShopping } from '../../context/ShoppingContext';
 
@@ -8,7 +8,7 @@ interface ShoppingItemCardProps {
 }
 
 export const ShoppingItemCard: React.FC<ShoppingItemCardProps> = ({ item }) => {
-  const { toggleCompleted, updateQuantity, removeItem } = useShopping();
+  const { toggleCompleted, updateQuantity, removeItem, toggleItemRecurring } = useShopping();
 
   return (
     <div className={`item-card ${item.completed ? 'completed' : ''}`}>
@@ -32,8 +32,28 @@ export const ShoppingItemCard: React.FC<ShoppingItemCardProps> = ({ item }) => {
             {item.dietaryTags && item.dietaryTags.length > 0 && (
               <span className="tag-badge">{item.dietaryTags[0]}</span>
             )}
+            {item.isRecurring && (
+              <button
+                className="recurring-badge active"
+                onClick={() => toggleItemRecurring(item.id, 7)}
+                title="Recurring staple (every 7 days). Click to toggle."
+              >
+                <Repeat size={11} />
+                <span>Every {item.recurringDays || 7}d</span>
+              </button>
+            )}
+            {!item.isRecurring && (
+              <button
+                className="recurring-badge subtle"
+                onClick={() => toggleItemRecurring(item.id, 7)}
+                title="Mark this item as recurring weekly"
+              >
+                <Repeat size={11} />
+                <span>Repeat</span>
+              </button>
+            )}
             {item.source === 'voice' && (
-              <span style={{ color: 'var(--accent-cyan)', fontSize: '0.7rem' }}>• Voice added</span>
+              <span className="voice-source-tag">• Voice</span>
             )}
           </div>
         </div>
@@ -79,3 +99,4 @@ export const ShoppingItemCard: React.FC<ShoppingItemCardProps> = ({ item }) => {
     </div>
   );
 };
+

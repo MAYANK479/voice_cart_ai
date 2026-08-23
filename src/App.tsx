@@ -8,6 +8,7 @@ import { RestockWidget } from './components/Sidebar/RestockWidget';
 import { CatalogModal } from './components/Modals/CatalogModal';
 import { SmartSuggestionsModal } from './components/Modals/SmartSuggestionsModal';
 import { HelpModal } from './components/Modals/HelpModal';
+import { BuildMyListModal } from './components/Modals/BuildMyListModal';
 import { ToastContainer } from './components/UI/ToastContainer';
 import { InsightsView } from './components/Insights/InsightsView';
 import { HistoryView } from './components/History/HistoryView';
@@ -50,6 +51,7 @@ const AppContent: React.FC = () => {
       {/* Interactive Modals */}
       <CatalogModal />
       <SmartSuggestionsModal />
+      <BuildMyListModal />
       <HelpModal />
 
       {/* Global Toast Feedback Stack */}
@@ -57,6 +59,7 @@ const AppContent: React.FC = () => {
     </div>
   );
 };
+
 
 export const App: React.FC = () => {
   return (

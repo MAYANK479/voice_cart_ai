@@ -400,6 +400,19 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
     itemsContent = itemsContent.replace(addTrailPattern, '');
   }
 
+  // Check for target list specification e.g. "to party list", "to office list", "to home essentials"
+  let targetList: string | undefined = undefined;
+  const listMatch = itemsContent.match(/\b(?:to|in|for)\s+(party|office|home\s+essentials|home|weekly\s+grocery|weekly|grocery)\s*(?:list)?\b/i);
+  if (listMatch) {
+    const listKey = listMatch[1].toLowerCase();
+    if (listKey.includes('party')) targetList = 'party';
+    else if (listKey.includes('office')) targetList = 'office';
+    else if (listKey.includes('home')) targetList = 'home-essentials';
+    else if (listKey.includes('weekly') || listKey.includes('grocery')) targetList = 'weekly-grocery';
+
+    itemsContent = itemsContent.replace(listMatch[0], '').trim();
+  }
+
   // Strip trailing "to my list", "to the shopping list", "in my cart"
   itemsContent = itemsContent
     .replace(/\b(to my list|to the list|to my shopping list|in my cart|on my list|a mi lista|à ma liste|zu meiner liste|लिस्ट में)\b/gi, '')
@@ -419,6 +432,7 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
 
     const parsed = parseSingleItemString(rawItemStr);
     if (parsed.name && parsed.name.length > 1) {
+      if (targetList) parsed.targetList = targetList;
       parsedItems.push(parsed);
     }
   }
@@ -436,12 +450,15 @@ export function parseVoiceCommand(transcript: string, language: SupportedLanguag
     if (parsedItems.some((i) => i.attributes && i.attributes.length > 0)) confidenceScore += 0.03;
     result.confidence = Math.min(0.98, confidenceScore);
     result.items = parsedItems;
+    result.targetList = targetList;
     result.suggestedAction = 'ADD';
 
     const itemNames = parsedItems.map((i) => `${i.quantity} ${i.unit !== 'item' ? i.unit + ' ' : ''}${i.name}`).join(', ');
-    result.feedbackMessage = `Added ${itemNames} to your shopping list.`;
+    const listLabel = targetList ? ` ${targetList.replace('-', ' ')} list` : ' shopping list';
+    result.feedbackMessage = `Added ${itemNames} to your${listLabel}.`;
     return result;
   }
+
 
 
 
