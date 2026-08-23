@@ -252,6 +252,27 @@ export const storageService = {
     }
   },
 
+  getTheme(): 'dark' | 'light' {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.THEME) as 'dark' | 'light';
+      if (data === 'dark' || data === 'light') return data;
+      if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        return 'light';
+      }
+      return 'dark';
+    } catch {
+      return 'dark';
+    }
+  },
+
+  saveTheme(theme: 'dark' | 'light'): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.THEME, theme);
+    } catch (e) {
+      console.warn('Error saving theme setting', e);
+    }
+  },
+
   exportToCSV(items: ShoppingItem[]): void {
     const headers = ['Item Name', 'Quantity', 'Unit', 'Category', 'Estimated Price (USD)', 'Status', 'Added At'];
     const rows = items.map((item) => [
@@ -284,3 +305,4 @@ export const storageService = {
     document.body.removeChild(link);
   },
 };
+

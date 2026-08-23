@@ -57,7 +57,13 @@ interface ShoppingContextType {
   undoDelete: () => void;
   lastDeletedItem: ShoppingItem | null;
 
+  // Theme
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
+  toggleTheme: () => void;
+
   // Speech & Voice State
+
   speechStatus: SpeechStatus;
   isListening: boolean;
   interimTranscript: string;
@@ -132,8 +138,44 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [budget, setBudgetState] = useState<number>(() => storageService.getBudget());
   const [lastDeletedItem, setLastDeletedItem] = useState<ShoppingItem | null>(null);
 
+  const [theme, setThemeState] = useState<'dark' | 'light'>(() => storageService.getTheme());
   const [currentLanguage, setCurrentLanguageState] = useState<SupportedLanguage>(() => storageService.getLanguage());
   const [ttsEnabled, setTtsEnabledState] = useState<boolean>(() => storageService.getTTSEnabled());
+
+  const setTheme = useCallback((newTheme: 'dark' | 'light') => {
+    setThemeState(newTheme);
+    storageService.saveTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+    if (newTheme === 'light') {
+      document.documentElement.classList.add('light-theme');
+    } else {
+      document.documentElement.classList.remove('light-theme');
+    }
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setThemeState((prev) => {
+      const nextTheme = prev === 'dark' ? 'light' : 'dark';
+      storageService.saveTheme(nextTheme);
+      document.documentElement.setAttribute('data-theme', nextTheme);
+      if (nextTheme === 'light') {
+        document.documentElement.classList.add('light-theme');
+      } else {
+        document.documentElement.classList.remove('light-theme');
+      }
+      return nextTheme;
+    });
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'light') {
+      document.documentElement.classList.add('light-theme');
+    } else {
+      document.documentElement.classList.remove('light-theme');
+    }
+  }, [theme]);
+
 
   // Voice recognition states
   const [speechStatus, setSpeechStatus] = useState<SpeechStatus>('idle');
@@ -744,7 +786,11 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         resetToDemo,
         undoDelete,
         lastDeletedItem,
+        theme,
+        setTheme,
+        toggleTheme,
         speechStatus,
+
         isListening,
         interimTranscript,
         lastTranscript,

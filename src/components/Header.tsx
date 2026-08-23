@@ -1,5 +1,19 @@
 import React from 'react';
-import { Mic, Volume2, VolumeX, HelpCircle, ShoppingBag, Sparkles, RefreshCw, BarChart3, History, Terminal, LayoutDashboard } from 'lucide-react';
+import {
+  Mic,
+  Volume2,
+  VolumeX,
+  HelpCircle,
+  ShoppingBag,
+  Sparkles,
+  RefreshCw,
+  BarChart3,
+  History,
+  Terminal,
+  LayoutDashboard,
+  Sun,
+  Moon,
+} from 'lucide-react';
 import { useShopping } from '../context/ShoppingContext';
 import { SUPPORTED_LANGUAGES } from '../data/languageData';
 import { SupportedLanguage } from '../types/speech';
@@ -8,6 +22,8 @@ export const Header: React.FC = () => {
   const {
     activeView,
     setActiveView,
+    theme,
+    toggleTheme,
     currentLanguage,
     setLanguage,
     ttsEnabled,
@@ -20,6 +36,7 @@ export const Header: React.FC = () => {
     items,
     commandLogs,
   } = useShopping();
+
 
   return (
     <header className="header-container" role="banner">
@@ -134,12 +151,26 @@ export const Header: React.FC = () => {
           <HelpCircle size={17} />
         </button>
 
+        {/* Theme Toggle Button (Dark / Light) */}
+        <button
+          className="btn-icon theme-toggle-btn"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? (
+            <Sun size={17} color="#fbbf24" className="theme-icon-sun" />
+          ) : (
+            <Moon size={17} color="#6366f1" className="theme-icon-moon" />
+          )}
+        </button>
+
         {/* Reset Demo Data Button */}
         <button
           className="btn-icon"
           onClick={resetToDemo}
-          title="Reset Sample Data & Demo State"
-          aria-label="Reset Sample Data"
+          title="Reset Demo Shopping List & History"
+          aria-label="Reset Demo Data"
         >
           <RefreshCw size={17} />
         </button>
@@ -147,4 +178,3 @@ export const Header: React.FC = () => {
     </header>
   );
 };
-
