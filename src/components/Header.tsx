@@ -6,7 +6,6 @@ import {
   HelpCircle,
   ShoppingBag,
   Sparkles,
-  RefreshCw,
   BarChart3,
   History,
   Terminal,
@@ -33,11 +32,11 @@ export const Header: React.FC = () => {
     setCatalogModalOpen,
     setSuggestionsModalOpen,
     setHelpModalOpen,
-    resetToDemo,
     pendingCount,
     items,
     commandLogs,
   } = useShopping();
+
 
 
   return (
@@ -107,6 +106,21 @@ export const Header: React.FC = () => {
 
       {/* Action Controls & Utilities */}
       <div className="header-actions">
+        {/* Theme Toggle Button (Dark / Light) - Prominently Placed */}
+        <button
+          className="btn-icon theme-toggle-btn"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+          aria-label={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+          style={{ background: theme === 'dark' ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 183, 178, 0.25)', borderColor: 'var(--accent-primary)' }}
+        >
+          {theme === 'dark' ? (
+            <Sun size={17} color="#fbbf24" className="theme-icon-sun" />
+          ) : (
+            <Moon size={17} color="#78716c" className="theme-icon-moon" />
+          )}
+        </button>
+
         {/* Language Selector */}
         <select
           aria-label="Select Voice Recognition Language"
@@ -129,7 +143,7 @@ export const Header: React.FC = () => {
           aria-label="Smart AI Suggestions"
         >
           <Sparkles size={15} color="#fbbf24" />
-          <span className="hide-mobile">Smart AI</span>
+          <span className="hide-on-compact">Smart AI</span>
         </button>
 
         {/* Store Catalog Search Button */}
@@ -140,7 +154,7 @@ export const Header: React.FC = () => {
           aria-label="Store Product Catalog"
         >
           <ShoppingBag size={15} color="#06b6d4" />
-          <span className="hide-mobile">Catalog</span>
+          <span className="hide-on-compact">Catalog</span>
           {pendingCount > 0 && <span className="badge-counter">{pendingCount}</span>}
         </button>
 
@@ -151,7 +165,7 @@ export const Header: React.FC = () => {
           title={ttsEnabled ? 'Mute Voice Assistant Feedback' : 'Unmute Voice Assistant Feedback'}
           aria-label={ttsEnabled ? 'Mute Voice Assistant' : 'Unmute Voice Assistant'}
         >
-          {ttsEnabled ? <Volume2 size={17} color="#10b981" /> : <VolumeX size={17} />}
+          {ttsEnabled ? <Volume2 size={16} color="var(--accent-mint-text)" /> : <VolumeX size={16} />}
         </button>
 
         {/* Help Modal Trigger */}
@@ -161,33 +175,10 @@ export const Header: React.FC = () => {
           title="Voice Commands Guide & Cheatsheet"
           aria-label="Voice Commands Guide"
         >
-          <HelpCircle size={17} />
-        </button>
-
-        {/* Theme Toggle Button (Dark / Light) */}
-        <button
-          className="btn-icon theme-toggle-btn"
-          onClick={toggleTheme}
-          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        >
-          {theme === 'dark' ? (
-            <Sun size={17} color="#fbbf24" className="theme-icon-sun" />
-          ) : (
-            <Moon size={17} color="#6366f1" className="theme-icon-moon" />
-          )}
-        </button>
-
-        {/* Reset Demo Data Button */}
-        <button
-          className="btn-icon"
-          onClick={resetToDemo}
-          title="Reset Demo Shopping List & History"
-          aria-label="Reset Demo Data"
-        >
-          <RefreshCw size={17} />
+          <HelpCircle size={16} />
         </button>
       </div>
     </header>
   );
 };
+
